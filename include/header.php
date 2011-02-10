@@ -4,7 +4,7 @@
  
 <head> 
   <meta charset="utf-8" /> 
-  <title>General Eye Movement Analysis Application</title> 
+  <title>Inpsyte Data Analysis</title> 
  
   <link rel="stylesheet" href="css/ge2.css" /> 
   <link type="text/css" href="css/black-tie/jquery-ui-1.8.9.custom.css" rel="stylesheet" /> 
@@ -97,7 +97,7 @@
 		
  		<article id='help_dropdown' style='display:none;'>
  			<ul>
- 				<li><a href='#'>You're on your own, kid.</a></li>
+ 				<li><a href='http://inpsyte.psychwire.co.uk'>Help files</a></li>
  		
  			</ul> 			
  		</article>
