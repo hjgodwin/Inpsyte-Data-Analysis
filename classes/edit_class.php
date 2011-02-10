@@ -295,6 +295,26 @@ class edit_control {
     if ($this->action!='modify'){
       echo "<form>The requested runner (".$this->name_to_edit.") has been deleted.<br>";
     }
+	
+	// delete aggregated tables 
+	 if ($this->runner_type=='responses' || $this->runner_type=='time_periods'){
+  		$this->delete_aggregated_tables();		
+  	}
+  }
+  
+  function delete_aggregated_tables(){
+  	// this function wipes the aggregated tables whenever a response is changed
+  	// or a time period is changed
+  	
+  	$participant_select = "SELECT ppt_id from ".$this->current_project.".participants";
+    $participant_result = mysql_query($participant_select);
+      
+    while($row2 = mysql_fetch_array($participant_result)){
+        $participant=$row2['ppt_id'];
+        $result=mysql_query("DROP TABLE IF EXISTS ".$this->current_project.".".$participant."_aggregated");
+        if(mysql_error){echo mysql_error();}
+      }
+	
   }
   
   function add_runner(){
@@ -346,7 +366,7 @@ class edit_control {
       $result=mysql_query("ALTER TABLE ".$this->current_project.".output 
         ADD ".$this->name_to_edit."_".$output_row['name']." VARCHAR (20)");
     }       
-  
+    
     echo "<form>Update complete.</form>";  
   }
       
