@@ -69,6 +69,42 @@ class runner_control {
     }
 
   function select_and_run(){
+    	
+	$need_more_runners = false;	
+		
+	// if this is an analysis, we need to work otu if responses and time periods have been run yet
+	// if they have not, we force the user to go back and run them first
+	if ($this->runner_interface->runner_type=='analyses'){
+		
+		// for this, we begin by working out how many participants we have and store it as a variable	
+		$result = mysql_query("select @participants := count(ppt_id) 
+			from ".$this->runner_interface->current_project.".participants");
+		
+		// we then do a right join for responses which returns a count of how many participants
+		// have responses that are not yet run	
+		$runner_select= mysql_query("select count(c.ppt_id), r.*,  @participants 
+			from ".$this->runner_interface->current_project.".completed_runner_list as c
+			right join ".$this->runner_interface->current_project.".responses_list as r on (r.name = c.runner)
+			group by r.name");	
+		
+		// sets to refuse running if necessary
+		while($runner_row = mysql_fetch_array($runner_select))
+      		{if($runner_row[0]<$runner_row[2]){$need_more_runners=true;}}	
+	
+		// now we do the same again but with time periods instead
+		$runner_select= mysql_query("select count(c.ppt_id), r.*,  @participants 
+			from ".$this->runner_interface->current_project.".completed_runner_list as c
+			right join ".$this->runner_interface->current_project.".time_periods_list as r on (r.name = c.runner)
+			group by r.name");	
+		
+		// sets to refuse running if necessary
+		while($runner_row = mysql_fetch_array($runner_select))
+      		{if($runner_row[0]<$runner_row[2]){$need_more_runners=true;}}	
+	
+	}
+		
+		
+	// select participatns who need this to be run	
     $participant_select = "SELECT participants.ppt_id FROM ".$this->runner_interface->current_project.".participants 
     WHERE participants.ppt_id NOT IN 
     (SELECT ppt_id FROM ".$this->runner_interface->current_project.".completed_runner_list WHERE runner='".$this->runner_interface->name."')";
@@ -79,7 +115,7 @@ class runner_control {
         $participant_array[]=$row['ppt_id'];
     }
     // run the real thing
-    if(count($participant_array)>0){    
+    if(count($participant_array)>0 && $need_more_runners==false){    
         foreach ($participant_array as $ppt){
 
             $this->participant = $ppt;
@@ -96,7 +132,10 @@ class runner_control {
         }
     }
 
-    if(count($participant_array)==0){echo "Those have already been run!";}    
+    if(count($participant_array)==0 && $need_more_runners==false){echo "Those have already been run!";}  
+	
+	if($need_more_runners==true) {echo "Can not run analysis. You need to make sure you have run all time
+		periods and responses before running analyses.";}
   }  
   
   function column_reset(){ 
