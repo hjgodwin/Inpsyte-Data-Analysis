@@ -32,14 +32,15 @@ th.selected {
 
 td {
   padding: 0.5em;  
-  border-style: inset;
+  border-style: none;
   background-color: white;
   border-left: 1px solid #a6a6a6;
   border-right: 1px solid #a6a6a6;
 }
 
 #table_popup td {
-	background-color: #f1f1f1; 
+	background-color: #f1f1f1;
+	border-style: none; 
 	padding:1em; 
 	margin-top:1em;
 	line-height:200%;margin-bottom:1em;border: 1px solid #a6a6a6;}
@@ -59,6 +60,7 @@ form {
 	margin-top:1em;
 	line-height:200%;
 	margin-bottom:1em;
+	display:block;
 }
 
 #navigation{
@@ -132,12 +134,11 @@ form {
 
 #maintext{
 	background:#f8f8f8; 
-	width:94%; 
+	width:94%;
 	padding-left:3%; 
 	padding-right:3%;
-	position:fixed;
-	top:60px;
 	z-index:1;
+	overflow:auto;
 }
 
 footer{
@@ -151,6 +152,7 @@ footer{
 	position: fixed;
 	bottom:0;
 	height:38px;
+	z-index:3;
 }
  
 form ul {padding-left:3%;}

@@ -3,8 +3,6 @@
 
 $(document).ready(function() { refresh_all();});
 
-
-
 function refresh_all(){
     refresh_participants_table();
     refresh_directory_list();

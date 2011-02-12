@@ -21,7 +21,9 @@ function popup_display(add_or_edit, custom, name_to_edit, runner){
   name: name_to_edit}, 
     function(data){
     $("#runner_popup").html(data);});
-  $( "#runner_popup" ).dialog({ modal: true, width:1000, height:700});
+    
+  $( "#runner_popup" ).dialog({ modal: true, width:1000, height:700, position:'top', maxheight:800});
+  
   
 }
 

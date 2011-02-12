@@ -73,21 +73,21 @@ class edit_control {
   // this is the function called by the extended classes to build the popup table
   function popup(){       
 
+	echo "<form id='popup_form' name='popup_form'>";
     echo "<table id='table_popup' style='width:100%;'>";
-    echo "<form id='popup_form'>";
-    
+        
     // Fill in appropriate variables for the form
     $this->form_filler();
        
-    echo "</form>";
     echo "</table>";
+	echo "</form>";
 
     echo "<input type='button' onclick='modify_runner(\"".$this->runner_type."\")' value='Submit'>";
     echo "<input type='button' onclick='close_analysis_popup()' value='Close'>";
     echo "<br><article id='popup_output'></article>";
     
-    echo "</form>";
-    echo "</table>";
+    //echo "</form>";
+    //echo "</table>";
        
   }
   

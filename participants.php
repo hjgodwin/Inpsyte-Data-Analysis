@@ -38,6 +38,7 @@ echo "<article><h1>Participants</h1>
 	<li>So what this means 	is you should basically name your files according to the format such as p01_s1 for participant 1, session 1. </li>
 	<li>Note that the raw data files need to be saved as tabbed-delimited text files. More options for this 
 	will be added in due course.</li>
+	</ul>
 	<input type='button' onclick='popup_add()' value='Add Participants'></form>
 	</article>";
 
@@ -54,7 +55,5 @@ echo "</article>";
 
 echo "<article id='delete_participant_section'>";
 echo "</article>";
-
-
 
 ?>

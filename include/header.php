@@ -13,7 +13,7 @@
    
  <script>
 			$().ready(function() {
-				//$('#edit').mouseenter(toggle_column).mouseleave(toggle_column);
+				
 				$('#edit').click(toggle_column);
 				$('#run').click(toggle_column);
 				$('#output').click(toggle_column);
@@ -109,6 +109,6 @@
  
  </header>
  
-
+<br><br><br><br>
 <article id='maintext'> 
 

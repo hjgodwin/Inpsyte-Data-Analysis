@@ -75,6 +75,7 @@ if ($table_type!='empty'){
 	
 	 
 	echo "<article id='runner_popup' title='Running...' style='display:none'>";
+	
 	echo "<article id='runner_popup_output'></article>";
 	
 	echo "</article>";

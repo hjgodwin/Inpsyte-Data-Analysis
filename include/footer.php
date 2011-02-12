@@ -1,5 +1,5 @@
 </article>
-
+<br><br><br><br><br><br><br><br><br><br><br><br>
  <footer>
    <a href="index.php?viewer=projects"><img src="css/3dmoon.png" align="center"></a>
           <?php echo $current_database; 
