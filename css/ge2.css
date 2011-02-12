@@ -4,9 +4,10 @@
 html { color:black; }
 
 body { 
-	font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; 
+	font-family: Arial, Lucida Grande, Lucida Sans, sans-serif; 
 	font-size: 14px;
 	background:#f8f8f8;
+	font-style:normal;
 }
 
 table {
@@ -71,6 +72,7 @@ form {
 	color:white;
 	font-size:16px;
 	letter-spacing:3px;
+	z-index:2;
 }
 
 #navigation li a, li a:hover, li a:active, li a:visited{
@@ -129,11 +131,13 @@ form {
   border-bottom:none; text-decoration: none;}
 
 #maintext{
-	padding-top:60px;
 	background:#f8f8f8; 
 	width:94%; 
 	padding-left:3%; 
 	padding-right:3%;
+	position:fixed;
+	top:60px;
+	z-index:1;
 }
 
 footer{
