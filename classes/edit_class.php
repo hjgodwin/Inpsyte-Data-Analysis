@@ -29,6 +29,7 @@ class edit_control {
   public $attribs = array();
   public $form_values= array();
   public $name_to_edit;
+  public $produce_output=false;
 
   public function __construct($current_project){
     $this->runner_type = $_GET['runner_type'];
@@ -358,15 +359,17 @@ class edit_control {
       }
     }
 
-    // this adds multi-sessions to the output table. sweet.
-    // note: this relies on having at least one of every session in the output table.
-    $output_result = mysql_query("SELECT name from ".$this->current_project.".session_list group by name");
-        
-    while($output_row = mysql_fetch_array($output_result)){
-      $result=mysql_query("ALTER TABLE ".$this->current_project.".output 
-        ADD ".$this->name_to_edit."_".$output_row['name']." VARCHAR (20)");
-    }       
-    
+	if ($this->runner_type=="analyses"){ // needed becaue we don't want output for responses or tps
+	    // this adds multi-sessions to the output table. sweet.
+	    // note: this relies on having at least one of every session in the output table.
+	    $output_result = mysql_query("SELECT name from ".$this->current_project.".session_list group by name");
+	        
+	    while($output_row = mysql_fetch_array($output_result)){
+	      $result=mysql_query("ALTER TABLE ".$this->current_project.".output 
+	        ADD ".$this->name_to_edit."_".$output_row['name']." VARCHAR (20)");
+	    }       
+	}
+	
     echo "<form>Update complete.</form>";  
   }
       

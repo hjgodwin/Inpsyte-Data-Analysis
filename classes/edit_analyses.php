@@ -23,7 +23,7 @@ class edit_analyses extends edit_control {
   function form_filler(){
     // Default for restriction count
     $this->restriction_count = 0;
-
+	
     // if we are adding, set the values for cleanness. it sets some defaults
     if ($this->action_value=='add'){
         $this->analysis_name='';
