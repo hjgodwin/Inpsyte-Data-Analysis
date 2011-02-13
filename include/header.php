@@ -87,6 +87,7 @@
  				<li><a href='index.php?viewer=view_trials'>View Trials</a></li>
  				<li><a href='index.php?viewer=inspect'>Inspect Data</a></li>
  				<li><a href='index.php?viewer=output'>Output</a></li>
+ 				<li><a href='index.php?viewer=histograms'>Histograms</a></li>
  			</ul> 			
  		</div>
  		

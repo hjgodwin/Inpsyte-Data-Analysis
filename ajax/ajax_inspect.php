@@ -87,7 +87,7 @@ if (isset($_GET['refresh']) && $_GET['refresh']=='runner_select_form'){
 	
 	/// this sets out what to select
     echo "<form id='change_project_form' name='change_project_form'>
-	    
+	Note: This section is a work in progress.<br>    
     <p>Select what you want to inspect here.</p>";
    
     echo "Analysis:"; option_list_builder("analyses_list", $analyses_list, 'draw_table()', $analyses);

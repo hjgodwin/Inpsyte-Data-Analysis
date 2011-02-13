@@ -7,7 +7,8 @@
           echo "Current Project is <b>".$current_project."</b>.";
                     
           ?>
-     INPSYTE DATA ANALYSIS (BETA-β) components coded 2009-2011 <a href="http://www.psychwire.co.uk">Hayward J. Godwin</a>. 
+     INPSYTE DATA ANALYSIS (BETA TESTING ONLY) components coded 2009-2011 <a href="http://www.psychwire.co.uk">Hayward J. Godwin</a>. 
+     Graphs created using code from the <a href='http://www.pchart.net/'>pChart library</a>. 
      
 
   </div>
