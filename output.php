@@ -25,16 +25,16 @@ echo "<script type='text/javascript'>
         refresh_all();
      </script> ";
 
-echo "<article><h1>Output Analyses</h1>
-</article>";
+echo "<div><h1>Output Analyses</h1>
+</div>";
 
-echo "<article id='output_selector'>";
-echo "</article>";
+echo "<div id='output_selector'>";
+echo "</div>";
 
-echo "<article id='output_view'>";
-echo "</article>";
+echo "<div id='output_view'>";
+echo "</div>";
 
-echo "<article id='excel_popup'>";
-echo "</article>";
+echo "<div id='excel_popup'>";
+echo "</div>";
 
 ?>

@@ -96,15 +96,15 @@ if (isset($_GET['refresh']) && $_GET['refresh']=='runner_select_form'){
 	
 	echo "<br><input type='button' onclick='slide_toggle()' value='Reveal/Hide List of Columns'>";
 	
-	echo "<article id='slide_section' style='display:none'>";
+	echo "<div id='slide_section' style='display:none'>";
 	
 	select_column_builder($current_project.".".$participant);
 	
-	echo "</article>";
+	echo "</div>";
 	    
     echo "</form>
 	
-    </article>";	
+    </div>";	
 }
 
 if (isset($_GET['action']) && $_GET['action']=='draw_table'){

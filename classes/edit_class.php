@@ -84,7 +84,7 @@ class edit_control {
 
     echo "<input type='button' onclick='modify_runner(\"".$this->runner_type."\")' value='Submit'>";
     echo "<input type='button' onclick='close_analysis_popup()' value='Close'>";
-    echo "<br><article id='popup_output'></article>";
+    echo "<br><div id='popup_output'></div>";
     
     //echo "</form>";
     //echo "</table>";

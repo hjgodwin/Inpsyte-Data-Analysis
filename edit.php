@@ -37,53 +37,53 @@ while($row = mysql_fetch_array($result)){$ppt_count = $row[0];}
 if ($ppt_count==0){$table_type = 'empty';}
 
 if ($table_type=='empty'){
-  echo "<article><h1>Cannot Continue without Particpiants</h1>
+  echo "<div><h1>Cannot Continue without Particpiants</h1>
   <b>You need to add participants to the project before Inpsyte Data Analysis can continue.<br>
   To do this click <a href='index.php?viewer=participants'>here</a>.</b>
-  </article>";
+  </div>";
 }
 
 if ($table_type!='empty'){
 	
 	if ($table_type=='analyses'){
-	  echo "<article><h1>Edit Analyses</h1>
+	  echo "<div><h1>Edit Analyses</h1>
 	  Analyses are used to create means for output (e.g. average time spent on a task).
-	  </article>"; 
+	  </div>"; 
 	}
 	
 	
 	if ($table_type=='time_periods'){
-	  echo "<article><h1>Edit Time Periods</h1>
+	  echo "<div><h1>Edit Time Periods</h1>
 	  Time periods are specific to eye tracking experiments and can be used to chart multiple events
 	  within a single trial, such as the appearance or disappearance of a given display.
-	  </article>"; 
+	  </div>"; 
 	}
 	
 	if ($table_type=='responses'){
-	  echo "<article><h1>Edit Responses</h1>
+	  echo "<div><h1>Edit Responses</h1>
 	  The responses are currently set up to be specific for eye tracking studies. Contact me if you want to 
 	  examine different forms of responses. Note that many forms of experimental software output responses
 	  in a specific column in the data, so you may be able to access the required information already for the
 	  analyses.
-	  </article>"; 
+	  </div>"; 
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
-	echo "<article id='interactive_table'>";
-	echo "</article>";
+	echo "<div id='interactive_table'>";
+	echo "</div>";
 	
 	 
-	echo "<article id='runner_popup' title='Running...' style='display:none'>";
+	echo "<div id='runner_popup' title='Running...' style='display:none'>";
 	
-	echo "<article id='runner_popup_output'></article>";
+	echo "<div id='runner_popup_output'></div>";
 	
-	echo "</article>";
+	echo "</div>";
 	
-	echo "<article id='delete_popup' title='Delete Runner' style='display:none'>";
-	echo "<article id='delete_popup_output'></article>";
+	echo "<div id='delete_popup' title='Delete Runner' style='display:none'>";
+	echo "<div id='delete_popup_output'></div>";
 	
-	echo "</article>";
+	echo "</div>";
 	
 }
 

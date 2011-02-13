@@ -22,17 +22,17 @@ include("javascript/jscript_inspect.php");
 echo "<script type='text/javascript'>
         refresh_all();
      </script> ";
-echo "<article><h1>Inspect Trials and Output</h1>
-</article>";
+echo "<div><h1>Inspect Trials and Output</h1>
+</div>";
 
 // change current project
-echo "<article id='runner_select_form'>";
-echo "</article>";
+echo "<div id='runner_select_form'>";
+echo "</div>";
 
 // check participant schema
-echo "<article id='trial_view'>";
-echo "</article>";
-echo "<article id='trial_view_output'>";
-echo "</article>";
+echo "<div id='trial_view'>";
+echo "</div>";
+echo "<div id='trial_view_output'>";
+echo "</div>";
 
 ?>

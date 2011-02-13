@@ -9,7 +9,7 @@ function refresher (get_target, refresh_target, container){
 
 
 function refresh_all(){
-    refresher("ajax/ajax_projects.php", "change_project_form", "#change_project_article");
+    refresher("ajax/ajax_projects.php", "change_project_form", "#change_project_div");
     //select_analysis_table();
 }
 

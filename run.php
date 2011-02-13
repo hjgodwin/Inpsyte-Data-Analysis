@@ -28,45 +28,45 @@ echo "<script type='text/javascript'>
      </script> ";
 
 if ($_GET['table']=='analyses'){
-  echo "<article><h1>Run Analyses</h1>
-  </article>"; 
+  echo "<div><h1>Run Analyses</h1>
+  </div>"; 
 }
 
 if ($_GET['table']=='events'){
-  echo "<article><h1>Run Events</h1>
-  </article>"; 
+  echo "<div><h1>Run Events</h1>
+  </div>"; 
 }
 
 if ($_GET['table']=='time_periods'){
-  echo "<article><h1>Run Time Periods</h1>
-  </article>"; 
+  echo "<div><h1>Run Time Periods</h1>
+  </div>"; 
 }
 
 if ($_GET['table']=='responses'){
-  echo "<article><h1>Run Responses</h1>
-  </article>"; 
+  echo "<div><h1>Run Responses</h1>
+  </div>"; 
 }
 
-echo "<article id='interactive_table'>";
+echo "<div id='interactive_table'>";
 
-echo "</article>";
+echo "</div>";
 
 
-echo "<article id='runner_popup' title='Running...' style='display:none'>";
-echo "<article id='runner_popup_output'></article>";
+echo "<div id='runner_popup' title='Running...' style='display:none'>";
+echo "<div id='runner_popup_output'></div>";
 
-echo "</article>";
+echo "</div>";
 
-echo "<article id='delete_popup' title='Delete Runner' style='display:none'>";
-echo "<article id='delete_popup_output'></article>";
+echo "<div id='delete_popup' title='Delete Runner' style='display:none'>";
+echo "<div id='delete_popup_output'></div>";
 
-echo "</article>";
+echo "</div>";
 
 // make this into an interactive popup.
 
-//echo "<article><h1>Test Analysis</h1></article>";
-echo "<article id='table_demo' style='display:none'>";
-echo "</article>";
+//echo "<div><h1>Test Analysis</h1></div>";
+echo "<div id='table_demo' style='display:none'>";
+echo "</div>";
 
 
 

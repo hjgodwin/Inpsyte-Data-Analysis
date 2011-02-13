@@ -24,15 +24,15 @@ include("functions/option_list_builder.php");
 echo "<script type='text/javascript'>
         refresh_all();
      </script> ";
-echo "<article><h1>View Trials [CURRENTLY NOT WORKING]</h1>
+echo "<div><h1>View Trials [CURRENTLY NOT WORKING]</h1>
 This does not work at the moment. AOI import has been disabled.
-</article>";
+</div>";
 
-echo "<article id='participant_list_form'>";
-echo "</article>";
+echo "<div id='participant_list_form'>";
+echo "</div>";
 
-echo "<article id='trial_view'>";
-echo "</article>";
+echo "<div id='trial_view'>";
+echo "</div>";
 
 
 

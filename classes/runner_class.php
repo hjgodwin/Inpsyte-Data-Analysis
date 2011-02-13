@@ -27,7 +27,7 @@ class runner_control {
   }
   
   function table_construct(){
-    echo "<article id='run_article' name='run_article'>";
+    echo "<div id='run_div' name='run_div'>";
     echo "<form>";
    
     $option_list = single_column_array_builder("".$this->runner_interface->current_project.".".

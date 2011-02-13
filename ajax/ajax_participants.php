@@ -41,9 +41,9 @@ if (isset($_GET['refresh']) && $_GET['refresh']=='tabbed_directory_list'){
 	echo "Above is the list of participants you are about to add to the project. Having large files
 	or large numbers of participants will make this process take longer.";
     echo "<input type='button' onclick='add_participants()' value='I am Ready. Add them now!'>";
-    echo "<article id='add_participant_output'></article>";
+    echo "<div id='add_participant_output'></div>";
     echo "</form>";
-    echo "</article>";
+    echo "</div>";
 }
 
 if (isset($_GET['refresh']) && $_GET['refresh']=='add_participants'){
@@ -91,14 +91,14 @@ if (isset($_GET['refresh']) && $_GET['refresh']=='delete_participant_section'){
 
 	if (count($participant_list)>0){
 	    // Start building the form now
-	    echo "<article><h1>Delete Participants</h1></article>";
-	    echo "<article id='delete_participants_form'>";
+	    echo "<div><h1>Delete Participants</h1></div>";
+	    echo "<div id='delete_participants_form'>";
 	    echo "<form>";
 	    echo "Participant ID:"; option_list_builder('select_participant_option', $participant_list, '', "");echo "<br>";
 	    echo "<input type='button' onclick='delete_participant()' value='Delete Selected Participant'>";
 	    echo "<input type='button' onclick='delete_all_participants()' value='Delete All Participants'>";
 	    echo "</form>";
-	    echo "</article>";
+	    echo "</div>";
 	}
 }
 

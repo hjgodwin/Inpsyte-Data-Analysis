@@ -42,7 +42,7 @@ if (isset($_GET['refresh'])){
 	    
 	    </form>
 	
-	    </article>";	
+	    </div>";	
 	
 	// add a new project
 	echo "<form id='add_project_form' name='add_project_form'>
@@ -53,7 +53,7 @@ if (isset($_GET['refresh'])){
     //echo "  <input type='button' id='name' name='name' value='Add Now!'>";		
     echo "</p>
       
-	<article id='add_project_output'>";
+	<div id='add_project_output'>";
 	
 	if ($current_project!=''){ echo "<br>";}
 	if ($current_project==''){ echo "<script>
@@ -62,11 +62,11 @@ if (isset($_GET['refresh'])){
 	alert('Welcome to INPSYTE Data Analysis. To begin with, create a new project.');
 	</script>";}
 	
-	echo "</article>
+	echo "</div>
 	
     </form>
     
-    </article>";
+    </div>";
 }
 
 if (isset($_GET['action']) && $_GET['action']=='change_project'){

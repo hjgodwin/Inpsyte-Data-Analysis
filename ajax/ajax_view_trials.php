@@ -48,12 +48,12 @@ if ($_GET['refresh']=='participant_list'){
     $participant_list = single_column_array_builder("".$current_project.".participants", "ppt_id");
 
     # Start building the form now
-    echo "<article id='participant_list_form' name='participant_list_form'>";
+    echo "<div id='participant_list_form' name='participant_list_form'>";
     echo "<form>";
     echo "Select Participant:"; option_list_builder('selected_participant', $participant_list, '', $participant_name);echo "<br>";
     echo "<input type='button' onclick='select_participant()' value='View Trials'>";
     echo "</form>";
-    echo "</article>";
+    echo "</div>";
 }
 
 if (isset($_GET['participant'])){

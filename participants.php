@@ -24,7 +24,7 @@ include("functions/option_list_builder.php");
 
 $current_directory = getcwd();
 
-echo "<article><h1>Participants</h1>
+echo "<div><h1>Participants</h1>
 <form>Some important information:
 	<ul>
 	<li>Use this page to add participants to the project.
@@ -40,20 +40,20 @@ echo "<article><h1>Participants</h1>
 	will be added in due course.</li>
 	</ul>
 	<input type='button' onclick='popup_add()' value='Add Participants'></form>
-	</article>";
+	</div>";
 
-echo "<article id='current_participants'>";
-echo "</article>";
+echo "<div id='current_participants'>";
+echo "</div>";
 
-echo "<article id='add_participant_popup' title='Add Participants' style='display:none;'>";
+echo "<div id='add_participant_popup' title='Add Participants' style='display:none;'>";
     
-echo "<article id='tabbed_directory_list'>";
-echo "</article>"; 
-echo "<article id='current_progress'></article>";
-echo "</article>";
+echo "<div id='tabbed_directory_list'>";
+echo "</div>"; 
+echo "<div id='current_progress'></div>";
+echo "</div>";
 
 
-echo "<article id='delete_participant_section'>";
-echo "</article>";
+echo "<div id='delete_participant_section'>";
+echo "</div>";
 
 ?>

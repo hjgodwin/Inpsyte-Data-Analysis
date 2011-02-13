@@ -1,6 +1,6 @@
-</article>
+</div>
 <br><br><br><br><br><br><br><br><br><br><br><br>
- <footer>
+ <div id ='footer'>
    <a href="index.php?viewer=projects"><img src="css/3dmoon.png" align="center"></a>
           <?php echo $current_database; 
           
@@ -10,7 +10,7 @@
      INPSYTE DATA ANALYSIS (BETA-β) components coded 2009-2011 <a href="http://www.psychwire.co.uk">Hayward J. Godwin</a>. 
      
 
-  </footer>
+  </div>
 
 </body>
 </html>

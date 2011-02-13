@@ -22,17 +22,17 @@ include("javascript/jscript_projects.php");
 echo "<script type='text/javascript'>
         refresh_all();
      </script> ";
-echo "<article><h1>Inpsyte Data Analysis: Dashboard / Administration</h1>
-</article>";
+echo "<div><h1>Inpsyte Data Analysis: Dashboard / Administration</h1>
+</div>";
 
 // change current project
-echo "<article id='change_project_article'>";
-echo "</article>";
+echo "<div id='change_project_div'>";
+echo "</div>";
 
 // check participant schema
-echo "<article id='check_schema_article'>";
-echo "</article>";
-echo "<article id='check_schema_output'>";
-echo "</article>";
+echo "<div id='check_schema_div'>";
+echo "</div>";
+echo "<div id='check_schema_output'>";
+echo "</div>";
 
 ?>

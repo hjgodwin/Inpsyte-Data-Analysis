@@ -28,11 +28,11 @@ include("../functions/create_excel.php");
 if ($_GET['refresh']=='output_list_form'){
 
     # Start building the form now
-    echo "<article id='edit_output_article' name='edit_output_article'>";
+    echo "<div id='edit_output_div' name='edit_output_div'>";
     echo "<form name='checklist_form' id='checklist_form'>";
     echo "<input type='button' onclick='save_db()' value='Download for Excel'>";
     echo "</form>";
-    echo "</article>";
+    echo "</div>";
     echo "<script>select_all(true);</script>";
 }
 
@@ -71,11 +71,11 @@ if (isset($_GET['run_analyses'])){
 
 if ($_GET['refresh']=='output_view'){
   
-  echo "<article>";
+  echo "<div>";
   
   table_builder("".$current_project.".output");
   
-  echo "</article>";
+  echo "</div>";
   
 }
 
