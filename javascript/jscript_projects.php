@@ -1,6 +1,7 @@
 <script language="javascript" type="text/javascript">
 <!--
 
+
 // you really need to include this from somewhere else
 function refresher (get_target, refresh_target, container){
     $.get(get_target, {refresh: refresh_target}, function(data){$(container).html(data);});
@@ -32,13 +33,21 @@ function change_project(){
 }
 
 function add_project(){
-  var selected_project =$('#name').val();
-  $.get("ajax/ajax_projects.php", { action: "add_project", project: selected_project},
-        function(data){
-        	//$("#add_project_output").html(data);
-        	alert("New project created successfully!");
-            window.location = "index.php?viewer=projects";
+
+	$("#add_project_output").html('');
+
+	var regex_string = /!|£|%|&| |<|>|,|'|@|#|~|[|]/;
+	if(regex_string.test($('#name').val())){ 
+		$("#add_project_output").append('Project name can only contain letters, numbers, or the underscore character.');} 
+	else {
+		
+  		var selected_project =$('#name').val();
+  		$.get("ajax/ajax_projects.php", { action: "add_project", project: selected_project},
+        		function(data){
+        			alert("New project created successfully!");
+            		window.location = "index.php?viewer=projects";
         });
+   }
 
 }
 

@@ -48,9 +48,10 @@ if (isset($_GET['refresh'])){
 	echo "<form id='add_project_form' name='add_project_form'>
     <h3>Add New Project</h3>
     <p> You can add a new project here.</p>";
-   	echo "<input type='text' id='name' name='name' value=''>";   
-    echo "  <input type='button' onclick='add_project()' value='Add Now!'>		
-    </p>
+   	echo "<input type='text' id='name' name='name' value='' class='required' minlength='2'>";   
+    echo "  <input type='button' onclick='add_project()' value='Add Now!'>";
+    //echo "  <input type='button' id='name' name='name' value='Add Now!'>";		
+    echo "</p>
       
 	<article id='add_project_output'>";
 	

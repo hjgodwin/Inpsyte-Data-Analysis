@@ -48,16 +48,16 @@ function change_restrictions(add_or_edit, custom, runner_name, more_or_less, cur
 
 function change_pairs(add_or_edit, custom, runner_name, more_or_less, current_count){
    var form_input=$('#popup_form').serialize();
-   
-   $.get("ajax/ajax_edit.php", {
-       action: "change_pairs",
-       action_value: more_or_less,
-       runner_type: runner_name,
-       /* is_custom: custom,*/
-       count: current_count,
-       current_data : 'form&' + form_input
-   }, 
-    function(data){$("#runner_popup").html(data);}); 
+      
+	   $.get("ajax/ajax_edit.php", {
+	       action: "change_pairs",
+	       action_value: more_or_less,
+	       runner_type: runner_name,
+	       /* is_custom: custom,*/
+	       count: current_count,
+	       current_data : 'form&' + form_input
+	   }, 
+	    function(data){$("#runner_popup").html(data);}); 
     
 }
 
@@ -65,6 +65,13 @@ function change_pairs(add_or_edit, custom, runner_name, more_or_less, current_co
 function modify_runner(modify_type){
    var form_input=$('#popup_form').serialize();
       
+    $("#popup_output").html('');
+
+	var regex_string = /!|£|%|&| |<|>|,|'|@|#|~|[|]/;
+	if(regex_string.test($('#name').val())){ 
+		$("#popup_output").append('Name can only contain letters, numbers, or the underscore character.');} 
+	else {
+
    $.get("ajax/ajax_edit.php", {
        action: "modify",
        runner_type: modify_type,
@@ -72,7 +79,7 @@ function modify_runner(modify_type){
     function(data){$("#popup_output").html(data);
       refresh_all(modify_type);
       }); 
-       
+       }
 }
 
 ///////////////////////// DOES NOT CURRENTLY WORK

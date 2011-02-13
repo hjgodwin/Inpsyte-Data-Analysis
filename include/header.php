@@ -1,15 +1,12 @@
-
-<!DOCTYPE html> 
-<html lang="en"> 
- 
-<head> 
-  <meta charset="utf-8" /> 
+<html> 
+ <head> 
   <title>Inpsyte Data Analysis</title> 
  
   <link rel="stylesheet" href="css/ge2.css" /> 
   <link type="text/css" href="css/black-tie/jquery-ui-1.8.9.custom.css" rel="stylesheet" /> 
   <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script> 
   <script type="text/javascript" src="js/jquery-ui-1.8.9.custom.min.js"></script> 
+   
    
  <script>
 			$().ready(function() {
@@ -104,9 +101,6 @@
  		
  	</article>
    
- 
- 
- 
  </header>
  
 <br><br><br><br>
