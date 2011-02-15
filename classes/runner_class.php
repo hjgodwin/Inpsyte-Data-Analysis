@@ -181,7 +181,7 @@ class runner_control {
                  AND runner = '".$this->runner_interface->name."') 
             WHERE ppt_id='".$this->current_true_ppt_id."'";
         
-        echo $output_query_string;
+        //echo $output_query_string;
         
         $output_query = mysql_query($output_query_string); 
         }

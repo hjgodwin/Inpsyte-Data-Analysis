@@ -169,9 +169,9 @@ class runner_analyses extends runner_control {
       // note this only counts for analyses where the user asked to look at events in some shape or form
       $this->select_time_period_trials_join_lister($this->time_period_list);
         
-      ECHO "<BR>";
-      echo $this->restriction_query;
-      ECHO "<BR>";
+      //ECHO "<BR>";
+      //echo $this->restriction_query;
+      //ECHO "<BR>";
     
   }
 
@@ -367,7 +367,7 @@ class runner_analyses extends runner_control {
 	     WHERE ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1 GROUP BY ".$this->group_by;
 	}
 	   
-    echo $this->runner_query_string;
+    //echo $this->runner_query_string;
     
   }
 
