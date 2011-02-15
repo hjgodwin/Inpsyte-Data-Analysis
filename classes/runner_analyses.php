@@ -241,7 +241,19 @@ class runner_analyses extends runner_control {
             
             $this->restriction_query.= " ) ";  
             
-            $tp_count++;
+			// this is used to select the lower bound of the time periods
+			// also used to sort out fix durs that overlap
+			if($tp_count==1){ $this->first_time_period_selected= $time_period."_time";}
+			
+			// this variable will, once the end of the list is reached, be set to the final
+			// time period selected (in terms of temporal order)
+			// it is used below to sort out fix durs that overlap across different time periods.
+			// however, we want to do this only when we have more than one tp in total,
+			// or else it sets the final tp to be the next tp up from the first (i.e., only)
+			$this->final_time_period_selected = $end_name;
+			
+			$tp_count++;
+			
           }   
         }
         
@@ -298,20 +310,64 @@ class runner_analyses extends runner_control {
     if (strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
       $this->computation_string = "COUNT(DISTINCT(".$this->input_column."))";
     }
+	
+	// this is used to shave times off fixation durations that occur as part of multiple time periods
+	if (count($this->time_period_list)>0 && strtolower($this->input_column)=='current_fix_duration'){
+		$this->runner_query_string = "INSERT INTO ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output
+	    (runner, ppt_id, participant, session_id, trial, value) 
+		SELECT '".$this->runner_interface->name."', '".$this->participant."',
+	    '".$this->current_true_ppt_id."', '".$this->current_session."', p.".$this->group_by.", 
+	    AVG(
+		  CASE
+			WHEN (cast(p.current_fix_start as signed) 
+				between cast(a.".$this->first_time_period_selected." as signed) 
+	  				and cast(a.".$this->final_time_period_selected." as signed)) 
+	  		    and (cast(p.current_fix_end as signed) between
+	  		    	cast(a.".$this->first_time_period_selected." as signed) 
+	   				and cast(a.".$this->final_time_period_selected." as signed)) 
+	   		THEN p.current_fix_duration
 
-    // this is for custom computations ¬¬¬ may need some checking
-    //   if ($input_column==''){
-    //        $computation_string = "AVG(".$computation.")";
-    //   }  
-        
-    // runner output table    
-    $this->runner_query_string = "INSERT INTO ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output 
-     (runner, ppt_id, participant, session_id, trial, value)
-     SELECT '".$this->runner_interface->name."', '".$this->participant."',
-     '".$this->current_true_ppt_id."', '".$this->current_session."', ".$this->group_by.",
-     ".$this->computation_string." 
-     FROM ".$this->runner_interface->current_project.".".$this->participant." 
-     WHERE ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1 GROUP BY ".$this->group_by;
+			WHEN (cast(p.current_fix_start as signed) 
+				between cast(a.".$this->first_time_period_selected." as signed) 
+	  				and cast(a.".$this->final_time_period_selected." as signed)) 
+	  			and (cast(p.current_fix_end as signed) > 
+	  				cast(a.".$this->final_time_period_selected." as signed)) 
+	  		THEN cast(a.".$this->final_time_period_selected." as signed) - cast(p.current_fix_start as signed)
+
+			WHEN (cast(p.current_fix_start as signed) 
+				< cast(a.".$this->first_time_period_selected." as signed)) 
+	  			and (cast(p.current_fix_end as signed) 
+	  				between cast(a.".$this->first_time_period_selected." as signed) and 
+	  				cast(a.".$this->final_time_period_selected." as signed))
+	  		THEN cast(p.current_fix_end as signed) - cast(a.".$this->first_time_period_selected." as signed)
+
+			WHEN (cast(p.current_fix_start as signed) 
+				< cast(a.".$this->first_time_period_selected." as signed)) 
+	   			and (cast(p.current_fix_end as signed) 
+	   				> cast(a.".$this->final_time_period_selected." as signed)) 
+	   		THEN cast(a.".$this->final_time_period_selected." as signed)- cast(a.".$this->first_time_period_selected." as signed)
+
+		 END
+		)
+		FROM ".$this->runner_interface->current_project.".".$this->participant." p
+		JOIN ".$this->runner_interface->current_project.".".$this->participant."_aggregated a ON a.trial_index = p.TRIAL_INDEX
+		WHERE p.".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1
+		GROUP BY p.".$this->group_by;
+		
+	}
+    
+    // runner output table - when no time periods are being looked at, and no fix durs too
+	else {
+	    $this->runner_query_string = "INSERT INTO ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output 
+	     (runner, ppt_id, participant, session_id, trial, value)
+	     SELECT '".$this->runner_interface->name."', '".$this->participant."',
+	     '".$this->current_true_ppt_id."', '".$this->current_session."', ".$this->group_by.",
+	     ".$this->computation_string." 
+	     FROM ".$this->runner_interface->current_project.".".$this->participant." 
+	     WHERE ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1 GROUP BY ".$this->group_by;
+	}
+	   
+    echo $this->runner_query_string;
     
   }
 

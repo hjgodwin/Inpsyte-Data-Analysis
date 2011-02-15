@@ -173,7 +173,7 @@ class runner_control {
         $this->runner_output_query();
         $runner_query = mysql_query($this->runner_query_string); if(mysql_error){echo mysql_error();}
 
-        if ($this->generate_output==true){
+        if ($this->generate_output==true){ // this selects analyses only
           /// excel output table
           $output_query_string= "UPDATE ".$this->runner_interface->current_project.".output 
             SET ".$this->runner_interface->name."_".$this->current_session."=(SELECT AVG(value) 
