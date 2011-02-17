@@ -22,7 +22,7 @@ function popup_display(add_or_edit, custom, name_to_edit, runner){
     function(data){
     $("#runner_popup").html(data);});
     
-  $( "#runner_popup" ).dialog({ modal: true, width:1000, height:700, position:'top', maxheight:800});
+  $( "#runner_popup" ).dialog({ modal: true, width:1000, height:900, position:'top', maxheight:900});
   
   
 }
@@ -82,26 +82,18 @@ function modify_runner(modify_type){
        }
 }
 
-///////////////////////// DOES NOT CURRENTLY WORK
-/*
-function add_ppt_set_custom_computation(switcher){
-  $.get("ajax/ajax_analyses.php", {refresh: "add_analysis_form", custom: switcher}, 
-    function(data){$("#add_analysis_popup").html(data);});
-}*/
-
 function delete_runner_confirm(input_name, runner){
+  $("#delete_popup").html("Inpsyte Data Analysis is processing your request. This may take some time.<br> <img src='css/3dmoonanimation.gif' width=50 height=50>");
   $.ajax({
    type: "GET",
    url: "ajax/ajax_edit.php",
    data: "action=confirm_delete&"+"name="+input_name+"&runner_type="+runner,
-   async:false,
+   async:true,
    success: function(msg){
-     //alert( data );
-      $("#delete_popup").html(msg);
+   	  $("#delete_popup").html(msg);
       refresh_all(runner); 
    }
  });
-  
   
 }
 

@@ -50,9 +50,7 @@
 </head> 
  
 <body> 
- 
- 
- 
+  
  <div id = 'header'>
  
 	<div id='navigation'>
@@ -106,4 +104,5 @@
  
 <br><br><br><br>
 <div id='maintext'> 
+
 

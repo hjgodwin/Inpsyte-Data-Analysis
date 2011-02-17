@@ -47,7 +47,7 @@ function popup_add(){
 
 
 function add_participants(){
-    $("#current_progress").html("Processing your request. Please wait...");
+    $("#current_progress").html("Processing your request. Please wait...<br> <img id='loading' src='css/3dmoonanimation.gif' width=50 height=50>");
     $.get("ajax/ajax_participants.php", { refresh: 'add_participants'}, function(data){
    $("#add_participant_output").html(data); 
    $("#current_progress").html("Participants added with no problems.");

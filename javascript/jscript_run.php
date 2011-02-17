@@ -13,7 +13,7 @@ function refresh_all(table){
 
 function run_selected(table_type, run_type){
   // clear the popup first
-  $("#runner_popup").html('');
+  $("#runner_popup").html("Inpsyte Data Analysis is processing your request. This may take some time.<br> <img src='css/3dmoonanimation.gif' width=50 height=50>");
 
   var selected_to_run =$('#selected_option :selected').val();
   //alert(selected_to_run);
@@ -23,7 +23,9 @@ function run_selected(table_type, run_type){
     function(data){
         
       $("#runner_popup").html(data);
+      
     });
+    
     //refresh_all(table_type);
 }
 

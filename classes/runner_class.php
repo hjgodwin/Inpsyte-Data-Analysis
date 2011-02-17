@@ -111,11 +111,18 @@ class runner_control {
    
     $participant_result = mysql_query($participant_select);
 
+	
     while($row = mysql_fetch_array($participant_result)){         
         $participant_array[]=$row['ppt_id'];
     }
     // run the real thing
-    if(count($participant_array)>0 && $need_more_runners==false){    
+    if(count($participant_array)>0 && $need_more_runners==false){
+    	
+		// draw loading logo
+		/*echo "<div id='loading'>Inpsyte Data Analysis is processing your request. This may take some time depeding upon the complexity 
+		of your request, and the amount of data that needs to be processed.
+		<br> <img src='css/3dmoonanimation.gif' width=50 height=50></div>";*/
+		    
         foreach ($participant_array as $ppt){
 
             $this->participant = $ppt;
@@ -128,8 +135,11 @@ class runner_control {
             $end_array = explode(' ', microtime() );
             $total_time = round(($end_array[0] +  $end_array[1] - $start),6);
 
-            echo "<br>".$ppt." running completed. Operation took ".$total_time. " to complete.<br>";
+            echo "<br>".$ppt." running completed. Operation took ".$total_time. " to complete.";
         }
+		
+		echo "All calculations complete.";
+		
     }
 
     if(count($participant_array)==0 && $need_more_runners==false){echo "Those have already been run!";}  

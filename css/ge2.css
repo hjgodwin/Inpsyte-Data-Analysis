@@ -154,6 +154,8 @@ form {
 	height:38px;
 	z-index:3;
 }
+
+#loading {text-align:center;}
  
 form ul {padding-left:3%;}
 
