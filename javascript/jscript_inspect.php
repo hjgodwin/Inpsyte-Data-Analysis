@@ -13,6 +13,9 @@ function refresh_all(){
 }
 
 function draw_table(){
+
+	$("#trial_view").html('');
+
 	// basic values
 	var trial_input =$('#trial_list :selected').val();
 	var analyses_input =$('#analyses_list :selected').val();

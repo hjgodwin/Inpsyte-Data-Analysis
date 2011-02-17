@@ -155,7 +155,11 @@ form {
 	z-index:3;
 }
 
-#loading {text-align:center;}
+#loading {
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
  
 form ul {padding-left:3%;}
 

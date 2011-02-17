@@ -83,7 +83,7 @@ function modify_runner(modify_type){
 }
 
 function delete_runner_confirm(input_name, runner){
-  $("#delete_popup").html("Inpsyte Data Analysis is processing your request. This may take some time.<br> <img src='css/3dmoonanimation.gif' width=50 height=50>");
+  $("#delete_popup").html("Inpsyte Data Analysis is processing your request. This may take some time.<br> <img id='loading' src='css/3dmoonanimation.gif' width=50 height=50>");
   $.ajax({
    type: "GET",
    url: "ajax/ajax_edit.php",
