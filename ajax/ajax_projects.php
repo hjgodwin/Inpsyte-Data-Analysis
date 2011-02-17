@@ -150,7 +150,7 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	`participant` VARCHAR(15) NOT NULL,
 	`session_id` VARCHAR(15) NOT NULL,
 	`trial` VARCHAR(10) NOT NULL,
-	`value` VARCHAR(10) NOT NULL,
+	`value` INT(10) NOT NULL,
 	PRIMARY KEY (`id`))
 	COLLATE='latin1_swedish_ci'
 	ENGINE=MyISAM
@@ -267,7 +267,7 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	`trial` VARCHAR(10) NOT NULL,
 	`search_text` VARCHAR(20) NOT NULL,
 	`temporal_order` VARCHAR(10) NOT NULL,
-	`value` VARCHAR(10) NOT NULL,
+	`value` INT(10) NOT NULL,
 	PRIMARY KEY (`id`),
 	INDEX `trial` (`trial`))
 	COLLATE='latin1_swedish_ci'

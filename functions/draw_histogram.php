@@ -11,6 +11,15 @@ $participant = $_GET['participant'];
 $bincount = $_GET['bincount'];
 $table = $_GET['table'];
 
+/*
+// USED FOR DEBUGGING
+
+$runner = 'after_fix_dur';
+$participant = 'all';
+$table='interruption';
+$bincount = 20;
+*/
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // THIS CALCULATES THE HISTOGRAM DATA ITSELF : BINS AND LABELS FOR GRAPH
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,8 +33,8 @@ $table = $_GET['table'];
       WHERE runner='".$runner."';";
   }
   
-  $min_query = mysql_query($min_query_string);
-  $min_data = mysql_fetch_row($min_query);
+  $min_query = mysql_query($min_query_string);if(mysql_error){echo mysql_error();} 
+  $min_data = mysql_fetch_row($min_query);if(mysql_error){echo mysql_error();} 
   $min = $min_data[0];
 
   if($participant=='all'){
@@ -38,7 +47,7 @@ $table = $_GET['table'];
       WHERE runner='".$runner."' AND ppt_id='".$participant."';";
   }     
   
-  $range_query = mysql_query($range_query_string);
+  $range_query = mysql_query($range_query_string);if(mysql_error){echo mysql_error();} 
   $range_data = mysql_fetch_row($range_query);
   $range = $range_data[0];
 
@@ -52,8 +61,10 @@ $table = $_GET['table'];
       WHERE runner='".$runner."' LIMIT 1;";
   }  
   
-  $binsize_query = mysql_query($binsize_query_string);    
-  $binsize_data = mysql_fetch_row($binsize_query);
+  //echo $min_query_string.$range_query_string.$binsize_query_string;
+  
+  $binsize_query = mysql_query($binsize_query_string); if(mysql_error){echo mysql_error();}    
+  $binsize_data = mysql_fetch_row($binsize_query);if(mysql_error){echo mysql_error();} 
   $binsize = $binsize_data[0];
   
   // setup bin labels
@@ -90,10 +101,12 @@ $table = $_GET['table'];
   
   $histogram_query = trim($query_core, ",");
 
+  //echo $histogram_query;
+
   $result = mysql_query($histogram_query); if(mysql_error){echo mysql_error();}   
   
   // call the query for the histogram data
-  $histogram_data = mysql_fetch_row($result);
+  $histogram_data = mysql_fetch_row($result);if(mysql_error){echo mysql_error();} 
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // GET STATS FOR THE GRAPH
@@ -110,8 +123,8 @@ if($participant=='all'){
       WHERE runner='".$runner."' LIMIT 1;";
   }
   
-  $stats_query = mysql_query($stats_query_string);
-  $stats_data = mysql_fetch_row($stats_query);
+  $stats_query = mysql_query($stats_query_string);if(mysql_error){echo mysql_error();} 
+  $stats_data = mysql_fetch_row($stats_query);if(mysql_error){echo mysql_error();} 
   $stat_min = $stats_data[0];
   $stat_max = $stats_data[1];
   $stat_avg = $stats_data[2];
