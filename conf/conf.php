@@ -35,7 +35,7 @@
 		
 	// if the config db does not exist - i.e., we need to install
 	if($rows==0 && !defined(INSTALL)){	
-		header( 'Location: ../inpsyte/install.php' ) ;
+		header( 'Location: install.php' ) ;
 	}
 
 	// this gets the config information and selects the current database
