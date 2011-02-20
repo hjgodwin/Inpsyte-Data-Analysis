@@ -136,7 +136,7 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	`id` INT(10) NOT NULL AUTO_INCREMENT,
 	`runner_type` VARCHAR(20) NOT NULL,
 	`runner_name` VARCHAR(20) NOT NULL,
-	`attribute_name` VARCHAR(40) NOT NULL,
+	`attribute_name` VARCHAR(100) NOT NULL,
 	`value` VARCHAR(40) NOT NULL,
 	PRIMARY KEY (`id`))
 	COLLATE='latin1_swedish_ci'
