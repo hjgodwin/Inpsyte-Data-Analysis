@@ -135,7 +135,7 @@ class runner_control {
     	echo "<br>Running completed. Operation took ".$total_time. " to complete.";
     }
 
-    if(count($participant_array)==0 && $need_more_runners==false){echo "Those have already been run!";}  
+    //if(count($participant_array)==0 && $need_more_runners==false){echo "Those have already been run!";}  
 	
 	if($need_more_runners==true) {echo "Can not run analysis. You need to make sure you have run all time
 		periods and responses before running analyses.";}

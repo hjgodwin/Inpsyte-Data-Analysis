@@ -96,7 +96,7 @@ class runner_analyses extends runner_control {
 	
 	// add basics of events/time periods
     foreach ($this->full_time_periods_list as $event){
-      $aggregated_sql .= ", IF(t.runner='".$event."', value, NULL) AS ".$event."_time ";     
+      $aggregated_sql .= ", min(IF(t.runner='".$event."', value, NULL)) AS ".$event."_time ";     
     }
 		
 	// close basics of sql trunk

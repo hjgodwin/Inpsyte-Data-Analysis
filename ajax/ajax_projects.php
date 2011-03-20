@@ -229,10 +229,9 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	`rt` VARCHAR(15) NOT NULL,
 	`outcome` VARCHAR(30) NOT NULL,
 	PRIMARY KEY (`id`),
-	INDEX `trial` (`trial`))
-	COLLATE='latin1_swedish_ci'
-	ENGINE=MyISAM
-	ROW_FORMAT=DYNAMIC");
+	INDEX `ppt_id` (`ppt_id`, `trial`)
+	)
+	ENGINE=MyISAM");
   
  $result=mysql_query("CREATE TABLE ".$_GET['project'].".session_list (
 	`name` VARCHAR(20) NULL DEFAULT NULL COMMENT 'Analysis Name',
@@ -259,6 +258,7 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	ROW_FORMAT=DYNAMIC");
       
  $result=mysql_query("CREATE TABLE ".$_GET['project'].".time_periods_output (
+	CREATE TABLE `time_periods_output` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`runner` VARCHAR(20) NOT NULL,
 	`ppt_id` VARCHAR(15) NOT NULL,
@@ -269,10 +269,8 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	`temporal_order` VARCHAR(10) NOT NULL,
 	`value` INT(10) NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
-	INDEX `trial` (`trial`))
-	COLLATE='latin1_swedish_ci'
-	ENGINE=MyISAM
-	ROW_FORMAT=DYNAMIC");
+	INDEX `ppt_id` (`ppt_id`, `trial`))
+	ENGINE=MyISAM");
  
  
 }
