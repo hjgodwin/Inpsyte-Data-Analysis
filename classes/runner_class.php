@@ -72,7 +72,7 @@ class runner_control {
     	
 	$need_more_runners = false;	
 	
-	// if this is an analysis, we need to work otu if responses and time periods have been run yet
+	// if this is an analysis, we need to work out if responses and time periods have been run yet
 	// if they have not, we force the user to go back and run them first
 	if ($this->runner_interface->runner_type=='analyses'){
 		

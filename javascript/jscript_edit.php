@@ -45,7 +45,7 @@ function change_restrictions(add_or_edit, custom, runner_name, more_or_less, cur
     function(data){$("#runner_popup").html(data);}); 
     
 }
-
+/*
 function change_pairs(add_or_edit, custom, runner_name, more_or_less, current_count){
    var form_input=$('#popup_form').serialize();
       
@@ -53,13 +53,13 @@ function change_pairs(add_or_edit, custom, runner_name, more_or_less, current_co
 	       action: "change_pairs",
 	       action_value: more_or_less,
 	       runner_type: runner_name,
-	       /* is_custom: custom,*/
+	       
 	       count: current_count,
 	       current_data : 'form&' + form_input
 	   }, 
 	    function(data){$("#runner_popup").html(data);}); 
     
-}
+}*/
 
 
 function modify_runner(modify_type){

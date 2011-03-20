@@ -30,8 +30,9 @@ class edit_time_periods extends edit_control {
         $this->temporal_order = '1';
         $this->search_text = '';
         $this->group_by = 'TRIAL_INDEX';
-        $this->pair_text_columns = array('');
-        $this->pair_time_columns = array('');
+		$this->fix_sacs = 'both';
+        //$this->pair_text_columns = array('');
+        //$this->pair_time_columns = array('');
     }
     
     // if we are editing, we fill in the values
@@ -43,11 +44,12 @@ class edit_time_periods extends edit_control {
         $this->temporal_order = $edit_data['temporal_order'];
         $this->search_text = $edit_data['search_text'];
         $this->group_by = $edit_data['group_by'];
+		$this->fix_sacs = $edit_data['fix_sacs'];
         
-        $this->pair_text_columns = array();
-        $this->pair_time_columns = array();
+        //$this->pair_text_columns = array();
+        //$this->pair_time_columns = array();
         
-        // handle infinite number of restrictions
+        /*// handle infinite number of restrictions
         for ( $i = 1; $i <= count($edit_data); $i+= 1) {
               
             if (array_key_exists('pair_'.$i.'_text_column', $edit_data)){
@@ -55,10 +57,10 @@ class edit_time_periods extends edit_control {
               $this->pair_time_columns[]=$edit_data['pair_'.$i.'_time_column'];
               $this->pair_count++;
             }           
-        }        
+        }       */ 
     }
 
-    if ($this->action=='change_pairs'){
+    /*if ($this->action=='change_pairs'){
    
       parse_str(urldecode($_SERVER['QUERY_STRING']), $edit_data);
         
@@ -87,16 +89,45 @@ class edit_time_periods extends edit_control {
             }
       }          
     
-    }
+    }*/
     
     // now build the form with our values!
     $this->form_textbox("name", "Time Period Name", $this->time_period_name);
     $this->form_textbox("temporal_order", "Temporal Order", $this->temporal_order);
     $this->form_textbox("search_text", "Text to Search for", $this->search_text);
-    $this->time_period_pair_builder($this->pair_count, $this->pair_text_columns, $this->pair_time_columns);
+	$this->form_event_checkboxes($this->fix_sacs);
+    //$this->time_period_pair_builder($this->pair_count, $this->pair_text_columns, $this->pair_time_columns);
     $this->form_optionlist("group_by", "Group By", $this->column_list, '', $this->group_by);  
 }
 
+
+function form_radioselect($name, $value, $text, $selected){
+	
+	echo "<input type='radio' name='".$name."' value='".$value."'"; 
+	
+	if ($selected == $value){echo " checked ";}
+	
+	echo " /> ".$text." &nbsp;";
+	
+}
+
+function form_event_checkboxes($selected_button){
+	
+	echo "<tr>";
+    echo "<td>";
+    echo "Event can occur during:";
+    echo "</td>";
+    echo "<td>";
+	$this->form_radioselect("fix_sacs", "fixations", "Fixations", $selected_button);
+	$this->form_radioselect("fix_sacs", "saccades", "Saccades", $selected_button);
+	$this->form_radioselect("fix_sacs", "both", "Both", $selected_button);
+	#echo "<input type='radio' name='fix_sacs' value='fixations' /> Fixations &nbsp;";
+	#echo "<input type='radio' name='fix_sacs' value='saccades' /> Saccades &nbsp;";
+	#echo "<input type='radio' name='fix_sacs' value='both' /> Both";
+	echo "</td>";
+}
+
+/*
  function time_period_pair_builder($max_number_of_pairs=3, $text_columns=array('','',''),$time_columns=array('','','')){
    
     echo "<tr>";
@@ -127,9 +158,10 @@ class edit_time_periods extends edit_control {
     echo "<input type='button' onclick='change_pairs(\"edit\", \"false\", \"".$this->runner_type."\", \"less\", \"".$max_number_of_pairs."\")' value='Remove Pair'>";
     echo "</td>";
     echo "</tr>";  
- }
+ }*/
        
 }
 
 ?>
+
 

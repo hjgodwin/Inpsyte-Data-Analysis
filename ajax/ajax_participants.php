@@ -28,9 +28,9 @@ include("../functions/option_list_builder.php");
 include("../functions/import_aois.php");
 include("../functions/get_current_details.php");
 
-if (isset($_GET['refresh']) && $_GET['refresh']=='current_participants'){
-    table_builder("".$current_project.".participants");
-}
+//if (isset($_GET['refresh']) && $_GET['refresh']=='current_participants'){
+  //  table_builder("".$current_project.".participants");
+//}
 
 if (isset($_GET['refresh']) && $_GET['refresh']=='tabbed_directory_list'){
 
