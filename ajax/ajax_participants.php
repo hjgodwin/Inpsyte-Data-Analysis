@@ -51,27 +51,34 @@ if (isset($_GET['refresh']) && $_GET['refresh']=='add_participants'){
     $available_participant_list = array();
     $available_participant_list = file_selector("../projects/".$current_project."/tabbedrawdata");
 
+    // first clear aggregated table to save it from getting messy
+    $result = mysql_query("DROP TABLE IF EXISTS ".$current_project.".datasets_aggregated");
+    
     if (count($available_participant_list>0)) {
         foreach ($available_participant_list as $ppt_id) {
                
            // import basic files etc.  
-           //import_aois($ppt_id, 320, getcwd());
+           //import_aois($ppt_id, 320, getcwd()); // aois no longer imported automatically
            //chdir('..');
            chdir("../projects/".$current_project."/tabbedrawdata");$current_dir = getcwd();
            import_tabbed_file($ppt_id, $current_dir);
-           
-           // add index for speed
-           $index = mysql_query("ALTER TABLE ".$current_project.".".$ppt_id." ADD INDEX TRIAL_INDEX (TRIAL_INDEX)");
-                  
+                          
            // work out what session this is
            $current_session = get_current_session($ppt_id);
     
            // work out true id of participant
-           $current_true_ppt_id = get_current_true_participant_id($ppt_id);
+           $current_true_ppt_id = get_current_true_participant_id($ppt_id);		   
   
-           // add this to the output database : note the true ppt id is the unique key here
-           $add_output = mysql_query("INSERT IGNORE INTO ".$current_project.".output 
-            SET ppt_id='".$current_true_ppt_id."'");  if(mysql_error){echo mysql_error();}
+  		   //add ppt id and session to database
+  		   $ids_sessions = mysql_query("UPDATE ".$current_project.".datasets
+  		   	SET INPSYTE__PPT_ID='".$ppt_id."', 
+  		   	INPSYTE__SESSION_ID='".$current_session."',
+  		   	INPSYTE__PPT_TRUE_ID='".$current_true_ppt_id."'
+  		   	WHERE INPSYTE__PPT_ID IS NULL AND INPSYTE__SESSION_ID IS NULL");
+  
+           // add this to the output database : note that true ppt id is the unique key here
+           //$add_output = mysql_query("INSERT IGNORE INTO ".$current_project.".output 
+           // SET ppt_id='".$current_true_ppt_id."'");  if(mysql_error){echo mysql_error();}
            
            // add this to the participant database: note the individual file is the unique key here
            $add_ppt = mysql_query("INSERT IGNORE INTO ".$current_project.".participants 
@@ -82,6 +89,7 @@ if (isset($_GET['refresh']) && $_GET['refresh']=='add_participants'){
            $add_session = mysql_query("INSERT IGNORE INTO ".$current_project.".session_list 
             SET name='".$current_session."'");  if(mysql_error){echo mysql_error();}
            }
+
     }
 }
 
@@ -119,15 +127,17 @@ if (isset($_POST['refresh']) && $_POST['refresh']=='delete' && isset($_POST['par
         // work out true id of participant
         $current_true_ppt_id = get_current_true_participant_id($participant);  
           
-        $result = mysql_query("DROP TABLE IF EXISTS ".$current_project.".".$participant."");
-        $result = mysql_query("DROP TABLE IF EXISTS ".$current_project.".".$participant."_aggregated");
+        //$result = mysql_query("DROP TABLE IF EXISTS ".$current_project.".".$participant."");
+        //$result = mysql_query("DROP TABLE IF EXISTS ".$current_project.".".$participant."_aggregated");
+        $result = mysql_query("DELETE FROM ".$current_project.".datasets WHERE INPSYTE__PPT_ID='".$participant."'");
+        $result = mysql_query("DELETE FROM ".$current_project.".datasets_aggregated WHERE INPSYTE__PPT_ID='".$participant."'");
         $result = mysql_query("DELETE FROM ".$current_project.".participants WHERE ppt_id='".$participant."'");
         $result = mysql_query("DELETE FROM ".$current_project.".aois WHERE ppt_id='".$participant."'");
         $result = mysql_query("DELETE FROM ".$current_project.".analyses_output WHERE ppt_id='".$participant."'");
         $result = mysql_query("DELETE FROM ".$current_project.".responses_output WHERE ppt_id='".$participant."'");
         $result = mysql_query("DELETE FROM ".$current_project.".time_periods_output WHERE ppt_id='".$participant."'");
         $result = mysql_query("DELETE FROM ".$current_project.".completed_runner_list WHERE ppt_id='".$participant."'");
-        $result = mysql_query("DELETE FROM ".$current_project.".output WHERE ppt_id='".$current_true_ppt_id."'");
+        //$result = mysql_query("DELETE FROM ".$current_project.".output WHERE ppt_id='".$current_true_ppt_id."'");
         
         chdir('..');
         $aoi_file_delete = getcwd().'/projects/'.$current_project.'/compiled_aois/aoi'.$participant.'.txt';

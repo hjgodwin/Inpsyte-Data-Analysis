@@ -28,7 +28,9 @@ function get_current_session($participant){
       // if an 's' is found somewhere, it's a session
       if (preg_match('/s/i', $value)){$session = $value;}
     }
-              
+    
+	if($session==''){$session='1';}
+	
     return $session;
 }
 

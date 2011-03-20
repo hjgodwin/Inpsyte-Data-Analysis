@@ -43,10 +43,10 @@ class edit_control {
     $this->name = $_GET['name'];
     
     // select the first ppt for use as a template for input etc.
-    $participant= $this->get_single_participant_id();
+    //$participant= $this->get_single_participant_id();
 
     // now build the arrays for the form
-    $this->column_list = @header_array_builder("".$this->current_project.".".$participant);
+    $this->column_list = @header_array_builder("".$this->current_project.".datasets");
     
     // Computation list 
     $this->computation_list = array("AVG", "SUM", "MAX", "MIN", "COUNT", "COUNT DISTINCT");
@@ -233,7 +233,7 @@ class edit_control {
   }
   
   
-  function delete_completed_runner($name){
+  /*function delete_completed_runner($name){
    // this function removes completed runners from the completed runner list
 
     $runner_query= "DELETE FROM ".$this->current_project.".completed_runner_list
@@ -243,7 +243,7 @@ class edit_control {
     
     if(mysql_error){echo mysql_error();}  
     
-  }
+  }*/
   
   function delete_runner_output($name, $output_list){
    // this function removes completed runners from the completed runner list
@@ -259,37 +259,10 @@ class edit_control {
 
   function delete_runner(){
      
-    // this drops relevant columns from output table. needs to get rid of both sessions so runs a reg ex. to do it.
-    $result=mysql_query("DESCRIBE ".$this->current_project.".output");
-    
-    $output_columns = array();
-    while($row = mysql_fetch_array($result)){
-        if (preg_match('/'.$this->name_to_edit.'/', $row[0])){
-          $output_columns[]=$row[0];}    
-    }
-      
-    foreach ($output_columns as $column){
-        $result=mysql_query("ALTER TABLE ".$this->current_project.".output DROP ".$column."");if(mysql_error){echo mysql_error();} 
-    }
-    
-    // run through deleting all participants who have had this run
-    $participant_select = "SELECT ppt_id from ".$this->current_project.".completed_runner_list WHERE
-      runner='".$this->name_to_edit."'";
-    $participant_result = mysql_query($participant_select);
-      
-    while($row2 = mysql_fetch_array($participant_result)){
-        $participant=$row2['ppt_id'];
-        # remove key headings for this analysis
-        $result=mysql_query("ALTER TABLE ".$this->current_project.".".$participant." DROP ".$this->runner_type."_".$this->name_to_edit."");
-        if(mysql_error){echo mysql_error();}
-        $result=mysql_query("ALTER TABLE ".$this->current_project.".".$participant." DROP ".$this->runner_type."_".$this->name_to_edit."_include");
-        if(mysql_error){echo mysql_error();}
-      }
-        
     // delete runner from database
     $this->delete_runner_attrib();
     $this->delete_runner_list($this->name_to_edit, $this->runner_type."_list");
-    $this->delete_completed_runner($this->name_to_edit);
+    //$this->delete_completed_runner($this->name_to_edit);
     $this->delete_runner_output($this->name_to_edit, $this->runner_type."_output");
     
     // output to browser
@@ -307,15 +280,7 @@ class edit_control {
   	// this function wipes the aggregated tables whenever a response is changed
   	// or a time period is changed
   	
-  	$participant_select = "SELECT ppt_id from ".$this->current_project.".participants";
-    $participant_result = mysql_query($participant_select);
-      
-    while($row2 = mysql_fetch_array($participant_result)){
-        $participant=$row2['ppt_id'];
-        $result=mysql_query("DROP TABLE IF EXISTS ".$this->current_project.".".$participant."_aggregated");
-        if(mysql_error){echo mysql_error();}
-      }
-	
+  	$result=mysql_query("DROP TABLE IF EXISTS ".$this->current_project.".datasets_aggregated");
   }
   
   function add_runner(){
@@ -359,17 +324,6 @@ class edit_control {
       }
     }
 
-	if ($this->runner_type=="analyses"){ // needed becaue we don't want output for responses or tps
-	    // this adds multi-sessions to the output table. sweet.
-	    // note: this relies on having at least one of every session in the output table.
-	    $output_result = mysql_query("SELECT name from ".$this->current_project.".session_list group by name");
-	        
-	    while($output_row = mysql_fetch_array($output_result)){
-	      $result=mysql_query("ALTER TABLE ".$this->current_project.".output 
-	        ADD ".$this->name_to_edit."_".$output_row['name']." VARCHAR (20)");
-	    }       
-	}
-	
     echo "<form>Update complete.</form>";  
   }
       

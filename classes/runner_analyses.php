@@ -22,7 +22,7 @@ class runner_analyses extends runner_control {
  
   function table_exists(){
     // used to check whether temporary table currently exists or not.
-    $result=@mysql_query("SELECT * FROM ".$this->runner_interface->current_project.".".$this->participant."_aggregated LIMIT 1");
+    $result=@mysql_query("SELECT * FROM ".$this->runner_interface->current_project.".datasets_aggregated LIMIT 1");
     
     $exists = false;
     
@@ -45,136 +45,113 @@ class runner_analyses extends runner_control {
     }
   }
 
-  function create_aggregated_table(){
-     
+   function get_responses_info(){
+    $result=mysql_query("SELECT name from ".$this->runner_interface->current_project.".responses_list");
+    
+    $this->full_responses_list = array();
+    
+    while($row = mysql_fetch_array($result)){         
+        $this->full_responses_list[]=$row['name'];
+    }
+  }
+   
+  function get_ppt_aggregated(){
+    // used to check whether temporary table currently exists or not.
+    $result=@mysql_query("SELECT * FROM ".$this->runner_interface->current_project.".datasets_aggregated 
+    	WHERE ppt='".$this->participant."' LIMIT 1");
+    
+	//echo "<Br>";
+	//echo "SELECT * FROM ".$this->runner_interface->current_project.".datasets_aggregated 
+    //	WHERE ppt='".$this->participant."' LIMIT 1";
+	
+    $exists = false;
+    
+    while($row = @mysql_fetch_array($result)){
+    
+      $exists = true;     
+    }
+    
+    return $exists;
+  }
+
+  function aggregated_table($type){
+    
+	// $type defines whether we create the aggregated monster or just add to it
+	if($type=='create'){$aggregated_sql = "CREATE TABLE ";}
+	if($type=='insert'){$aggregated_sql = "INSERT INTO ";}
+	 
     // create temporary table - trunk
     // p is participant table alias
     // r is response table alias
-    // other aliases are made dynamically 
-    $aggregated_sql = " CREATE TABLE ".$this->runner_interface->current_project.".".$this->participant."_aggregated
-      select distinct p.trial_index, r.response, r.rt, r.outcome, '".$this->participant."' ";
+    // t is time period table alias
+    // this does a dynamic join based on whether there are time periods and/or responses
+            
+    $aggregated_sql .= $this->runner_interface->current_project.".datasets_aggregated
+      SELECT p.INPSYTE__PPT_ID, p.trial_index ";
     
-    // add basics of events/time periods
+	// if responses have been set up, include them in the aggregated table
+	if (count($this->full_responses_list)>0){
+		 $aggregated_sql .= " , r.response, r.rt, r.outcome ";	
+	}
+	
+	// add basics of events/time periods
     foreach ($this->full_time_periods_list as $event){
-      $aggregated_sql .= ", t_".$event.".value AS ".$event."_time ";
+      $aggregated_sql .= ", IF(t.runner='".$event."', value, NULL) AS ".$event."_time ";     
     }
+		
+	// close basics of sql trunk
+    $aggregated_sql .= " FROM ".$this->runner_interface->current_project.".datasets AS p ";
+	
+	// if we have both time periods and responses, join them both
+	if (count($this->full_responses_list)>0 && count($this->full_time_periods_list)>0){
+	    // add join for responses table
+	    $aggregated_sql .= " LEFT JOIN ".$this->runner_interface->current_project.".responses_output AS r 
+	    on r.ppt_id=p.INPSYTE__PPT_ID and p.trial_index= r.trial ";
+	    
+	    // add join for the various events (dynamic)
+	  //  foreach ($this->full_time_periods_list as $event){
+	      $aggregated_sql .= " LEFT JOIN ".$this->runner_interface->current_project.".time_periods_output 
+	      	AS t ON t.ppt_id=r.ppt_id AND t.trial = r.trial ";
+	   // }
+	}
+	
+	// if we have just time periods, join them only
+	if (count($this->full_responses_list)==0 && count($this->full_time_periods_list)>0){
+	    
+	    // add join for the various events (dynamic)
+	   // foreach ($this->full_time_periods_list as $event){
+	      $aggregated_sql .= " LEFT JOIN ".$this->runner_interface->current_project.".time_periods_output 
+	      	AS t ON t.ppt_id=p.INPSYTE__PPT_ID and p.trial_index= t.trial ";
+	    //}
+	}
+		
+	// if we have just responses, join them only
+	if (count($this->full_responses_list)>0 && count($this->full_time_periods_list)==0){
+	    // add join for responses table
+	    $aggregated_sql .= " LEFT JOIN ".$this->runner_interface->current_project.".responses_output AS r 
+	    on r.ppt_id=p.INPSYTE__PPT_ID and p.trial_index= r.trial ";		
+		
+	}
     
-    // close basics of sql trunk
-    $aggregated_sql .= " from ".$this->runner_interface->current_project.".".$this->participant." AS p ";
+    $aggregated_sql .= "GROUP BY p.INPSYTE__PPT_ID, p.trial_index";
 
-    // add join for responses table
-    $aggregated_sql .= " left join ".$this->runner_interface->current_project.".responses_output AS r on (p.trial_index= r.trial and r.ppt_id='".$this->participant."')";
-    
-    // add join for the various events (dynamic)
-    foreach ($this->full_time_periods_list as $event){
-      $aggregated_sql .= " left join ".$this->runner_interface->current_project.".time_periods_output AS t_".$event." on 
-        (p.trial_index= t_".$event.".trial and t_".$event.".ppt_id='".$this->participant."' 
-        and t_".$event.".runner='".$event."') ";
-    }
-    
-    $result=mysql_query($aggregated_sql); if(mysql_error){echo mysql_error();}
-             
+	$result=mysql_query($aggregated_sql); if(mysql_error){echo mysql_error();}
+	
+	echo $aggregated_sql;
+	
+	// add indices for speed
+	if($type=='create'){
+		// add index for speed - this column will be need to be set by the user in the future
+	//	$result =mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets_aggregated 
+	//		ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY"); if(mysql_error){echo mysql_error();}
+				
+        $index = mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets_aggregated 
+        	ADD INDEX trial_index (trial_index),
+        	ADD INDEX INPSYTE__PPT_ID (INPSYTE__PPT_ID)"); if(mysql_error){echo mysql_error();}
+	}
+           
   }
  
-  function selection_query(){
-    
-    //$this->dummy_run=true;
-    
-    // this will be different for each runner type
-    $this->computation = $this->runner_data['computation'];
-    $this->input_column = $this->runner_data['input_column'];
-    $this->group_by = $this->runner_data['group_by'];
-
-    // set up info for time periods, inc full list and temporal order
-    $this->get_time_periods_info();
-
-    $this->restriction_columns=array();
-    $this->restriction_symbols=array();
-    $this->restriction_texts=array();
-
-    $this->response_list = array();
-    $this->outcome_list = array();
-    $this->time_period_list = array();
-
-    // sort out temporary table - create if it doesnt exist already
-    $this->aggregated_table_exists = $this->table_exists();
-    if ($this->aggregated_table_exists==false){
-      $this->create_aggregated_table();
-    }
-
-    $this->restriction_query =" UPDATE ".$this->runner_interface->current_project.".".$this->participant." p
-      JOIN ".$this->runner_interface->current_project.".".$this->participant."_aggregated a ON a.trial_index = p.".$this->group_by."
-      SET p.".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1 ";
-      
-    $this->where_written = false;
-
-    //print_r($this->runner_data);
-
-    // handle various monstrous arrays - restrictions, responses, time periods, outcomes
-    for ( $i = 1; $i <= count($this->runner_data); $i+= 1) {
-       
-       // handle infinite number of restrictions
-       if (array_key_exists('restriction_'.$i.'_column', $this->runner_data)){
-         
-          $this->add_where_check();
-
-          // equals comparison 
-          if ($this->runner_data['restriction_'.$i.'_symbol'] == '='){
-            $this->restriction_query .= "p.".$this->runner_data['restriction_'.$i.'_column']." ".
-              $this->runner_data['restriction_'.$i.'_symbol'].
-              "'".$this->runner_data['restriction_'.$i.'_text']."' ";
-          }
-
-          // like COMPARISON
-          if ($this->runner_data['restriction_'.$i.'_symbol'] == 'LIKE'){
-            $this->restriction_query .= "p.".$this->runner_data['restriction_'.$i.'_column']." ".
-              $this->runner_data['restriction_'.$i.'_symbol'].
-              "'%".$this->runner_data['restriction_'.$i.'_text']."%' ";
-          }
-
-          // numerical comparison
-          if ($this->runner_data['restriction_'.$i.'_symbol'] == '>' 
-            || $this->runner_data['restriction_'.$i.'_symbol'] == '<'
-            || $this->runner_data['restriction_'.$i.'_symbol'] == '<='
-            || $this->runner_data['restriction_'.$i.'_symbol'] == '>='){
-            $this->restriction_query .= " CAST("."p.".$this->runner_data['restriction_'.$i.'_column']." AS SIGNED) ".
-              $this->runner_data['restriction_'.$i.'_symbol'].
-              " CAST(".$this->runner_data['restriction_'.$i.'_text']." AS SIGNED) ";
-          }          
-        }
-
-        // if we have selected specific response(s) to look at
-        if (array_key_exists('response_'.$i, $this->runner_data)){
-          $this->response_list[]= $this->runner_data['response_'.$i];
-        }
-        
-        // if we have selected specific outcome(s) to look at
-        if (array_key_exists('outcome_'.$i, $this->runner_data)){
-         $this->outcome_list[]= $this->runner_data['outcome_'.$i];  
-        }
- 
-        // HANDLES time periods       
-        if (array_key_exists('time_period_'.$i, $this->runner_data)){
-         $this->time_period_list[]= $this->runner_data['time_period_'.$i]; 
-        }
-                
-    }
- 
-      // do user-selected aspects of the joinery
-      $this->join_lister($this->response_list, "response");
-      $this->join_lister($this->outcome_list, "outcome");
-      $this->time_period_join_lister($this->time_period_list);
- 
-      // now select only trials where all events occurred
-      // note this only counts for analyses where the user asked to look at events in some shape or form
-      $this->select_time_period_trials_join_lister($this->time_period_list);
-        
-      //ECHO "<BR>";
-      //echo $this->restriction_query;
-      //ECHO "<BR>";
-    
-  }
-
   function select_time_period_trials_join_lister ($list){
         
     if(count($list)>0){
@@ -237,6 +214,9 @@ class runner_analyses extends runner_control {
             }
               
             $this->restriction_query.=" CAST(p.CURRENT_FIX_START AS SIGNED)
+              BETWEEN CAST(a.".$time_period."_time AS SIGNED) AND CAST(a.".$end_name." AS SIGNED)
+              OR 
+              CAST(p.CURRENT_FIX_END AS SIGNED)
               BETWEEN CAST(a.".$time_period."_time AS SIGNED) AND CAST(a.".$end_name." AS SIGNED) ";
             
             $this->restriction_query.= " ) ";  
@@ -298,26 +278,55 @@ class runner_analyses extends runner_control {
     }
     
   }
-
-  function runner_output_query(){
   
-    // handles the actual output of the analysis for each trial based on whether that row is selected
+ function selection_query(){
+	
+    //$this->dummy_run=true;
     
-    // these are for standard computations
+    // this will be different for each runner type
+    $this->computation = $this->runner_data['computation'];
+    $this->input_column = $this->runner_data['input_column'];
+    $this->group_by = $this->runner_data['group_by'];
+
+    // set up info for time periods, inc full list and temporal order
+    $this->get_time_periods_info();
+	
+	// set up info for responses
+	$this->get_responses_info();
+
+    $this->restriction_columns=array();
+    $this->restriction_symbols=array();
+    $this->restriction_texts=array();
+
+    $this->response_list = array();
+    $this->outcome_list = array();
+    $this->time_period_list = array();
+
+    // sort out temporary table - create if it doesnt exist already
+    $this->aggregated_table_exists = $this->table_exists();
+    if ($this->aggregated_table_exists==false){
+      $this->aggregated_table("create");
+    }
+		
+	// if it exists, we check if this ppt is part of it already
+	//$this->ppt_aggregated = $this->get_ppt_aggregated();
+    //if ($this->ppt_aggregated==false){
+    //  $this->aggregated_table("insert");
+    //}
+	
+	// these are for standard computations
     if (!strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
       $this->computation_string = $this->computation."(".$this->input_column.")";
     }
     if (strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
       $this->computation_string = "COUNT(DISTINCT(".$this->input_column."))";
     }
-	
+
 	// this is used to shave times off fixation durations that occur as part of multiple time periods
-	if (count($this->time_period_list)>0 && strtolower($this->input_column)=='current_fix_duration'){
-		$this->runner_query_string = "INSERT INTO ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output
-	    (runner, ppt_id, participant, session_id, trial, value) 
-		SELECT '".$this->runner_interface->name."', '".$this->participant."',
-	    '".$this->current_true_ppt_id."', '".$this->current_session."', p.".$this->group_by.", 
-	    AVG(
+	if (count($this->time_period_list)>0 && strtolower($this->input_column)=='current_fix_duration'
+		&& $this->computation=='avg'){
+		$this->computation_string = 
+		"AVG(
 		  CASE
 			WHEN (cast(p.current_fix_start as signed) 
 				between cast(a.".$this->first_time_period_selected." as signed) 
@@ -348,29 +357,98 @@ class runner_analyses extends runner_control {
 	   		THEN cast(a.".$this->final_time_period_selected." as signed)- cast(a.".$this->first_time_period_selected." as signed)
 
 		 END
-		)
-		FROM ".$this->runner_interface->current_project.".".$this->participant." p
-		JOIN ".$this->runner_interface->current_project.".".$this->participant."_aggregated a ON a.trial_index = p.TRIAL_INDEX
-		WHERE p.".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1
-		GROUP BY p.".$this->group_by;
-		
+		)";
+	
 	}
-    
-    // runner output table - when no time periods are being looked at, and no fix durs too
-	else {
-	    $this->runner_query_string = "INSERT INTO ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output 
+     
+	 $this->restriction_query = "INSERT INTO 
+	     ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output 
 	     (runner, ppt_id, participant, session_id, trial, value)
-	     SELECT '".$this->runner_interface->name."', '".$this->participant."',
-	     '".$this->current_true_ppt_id."', '".$this->current_session."', ".$this->group_by.",
+	     SELECT '".$this->runner_interface->name."', p.INPSYTE__PPT_ID,
+	     p.INPSYTE__PPT_TRUE_ID, p.INPSYTE__SESSION_ID, p.".$this->group_by.",
 	     ".$this->computation_string." 
-	     FROM ".$this->runner_interface->current_project.".".$this->participant." 
-	     WHERE ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include=1 GROUP BY ".$this->group_by;
-	}
-	   
-    //echo $this->runner_query_string;
+	     FROM ".$this->runner_interface->current_project.".datasets p
+	     join ".$this->runner_interface->current_project.".datasets_aggregated as a on 
+	     	p.INPSYTE__PPT_ID = a.INPSYTE__PPT_ID AND p.TRIAL_INDEX = a.trial_index";
+	 
+	 
+	//$this->restriction_query.= " WHERE p.INPSYTE__PPT_ID='".$this->participant."' ";
+	
+	//$this->where_written = true;
+    $this->where_written = false; // this was used before i set the WEHERE each time for the ppt_id
+
+    //print_r($this->runner_data);
+
+    // handle various monstrous arrays - restrictions, responses, time periods, outcomes
+    for ( $i = 1; $i <= count($this->runner_data); $i+= 1) {
+       
+       // handle infinite number of restrictions
+       if (array_key_exists('restriction_'.$i.'_column', $this->runner_data)){
+         
+          $this->add_where_check();
+
+          // equals comparison 
+          if ($this->runner_data['restriction_'.$i.'_symbol'] == '='){
+            $this->restriction_query .= "p.".$this->runner_data['restriction_'.$i.'_column']." ".
+              $this->runner_data['restriction_'.$i.'_symbol'].
+              "'".$this->runner_data['restriction_'.$i.'_text']."' ";
+          }
+
+          // like COMPARISON
+          if ($this->runner_data['restriction_'.$i.'_symbol'] == 'LIKE'){
+            $this->restriction_query .= "p.".$this->runner_data['restriction_'.$i.'_column']." ".
+              $this->runner_data['restriction_'.$i.'_symbol'].
+              "'%".$this->runner_data['restriction_'.$i.'_text']."%' ";
+          }
+
+          // numerical comparison
+          if ($this->runner_data['restriction_'.$i.'_symbol'] == '>' 
+            || $this->runner_data['restriction_'.$i.'_symbol'] == '<'
+            || $this->runner_data['restriction_'.$i.'_symbol'] == '<='
+            || $this->runner_data['restriction_'.$i.'_symbol'] == '>='){
+            $this->restriction_query .= " CAST("."p.".$this->runner_data['restriction_'.$i.'_column']." AS SIGNED) ".
+              $this->runner_data['restriction_'.$i.'_symbol'].
+              " CAST(".$this->runner_data['restriction_'.$i.'_text']." AS SIGNED) ";
+          }          
+        }
+
+        // if we have selected specific response(s) to look at
+        if (array_key_exists('response_'.$i, $this->runner_data)){
+          $this->response_list[]= $this->runner_data['response_'.$i];
+        }
+        
+        // if we have selected specific outcome(s) to look at
+        if (array_key_exists('outcome_'.$i, $this->runner_data)){
+         $this->outcome_list[]= $this->runner_data['outcome_'.$i];  
+        }
+ 
+        // HANDLES time periods       
+        if (array_key_exists('time_period_'.$i, $this->runner_data)){
+         $this->time_period_list[]= $this->runner_data['time_period_'.$i]; 
+        }
+                
+    }
+ 
+      // do user-selected aspects of the joinery
+      $this->join_lister($this->response_list, "response");
+      $this->join_lister($this->outcome_list, "outcome");
+      $this->time_period_join_lister($this->time_period_list);
+ 
+      // now select only trials where all events occurred
+      // note this only counts for analyses where the user asked to look at events in some shape or form
+      $this->select_time_period_trials_join_lister($this->time_period_list);
+      
+	  // close up and group by	  
+	  $this->restriction_query.= " GROUP BY p.INPSYTE__PPT_ID, p.TRIAL_INDEX ";
+	  
+      ECHO "<BR>";
+      echo $this->restriction_query;
+      ECHO "<BR>";
     
   }
-
+  
+  
+  
 }
 
 

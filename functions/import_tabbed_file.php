@@ -18,36 +18,71 @@
     along with Inpsyte Data Analysis.  If not, see <http://www.gnu.org/licenses/>. 
  */ //////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+function datasets_table_exists($dataset){
+    // used to check whether temporary table currently exists or not.
+    $result=@mysql_query("SELECT * FROM ".$dataset." LIMIT 1");
+    
+    $exists = false;
+    
+    while($row = @mysql_fetch_array($result)){
+      $exists = true;     
+    }
+    
+    return $exists;
+  }
+
 function import_tabbed_file ($ppt_id, $dir){
 
     // import global references
     global $current_project;
 
-    $result = mysql_query("CREATE TABLE IF NOT EXISTS ".$current_project.".".$ppt_id." ( dummy INT(10) NULL )");
+    
+	$datasets_exists = datasets_table_exists($current_project.".datasets");
+	
+	if($datasets_exists==false){
+    	$result = mysql_query("CREATE TABLE IF NOT EXISTS ".$current_project.".datasets ( dummy INT(10) NULL )");	
+	
+	    $fcontents = file ("../tabbedrawdata/".$ppt_id.".txt");
+	    $firstline = $fcontents[0];
+	    $headers = explode("\t", $firstline);
+	
+		$header_query = "ALTER TABLE ".$current_project.".datasets ";
+	
+	    # create the headers
+	    for ($j=0; $j<count($headers); $j++) {
+	        if ($j>0){$header_query.=", ";}	
+	        $header_query.="  ADD ".$headers[$j]." VARCHAR(30)";
+	    }
+	
+		$result = mysql_query($header_query);
+	
+	    $result = mysql_query("ALTER TABLE ".$current_project.".datasets DROP dummy");
 
-    $fcontents = file ("../tabbedrawdata/".$ppt_id.".txt");
-    $firstline = $fcontents[0];
-    $headers = explode("\t", $firstline);
+		// session and ppt_id columns added here
+		$result = mysql_query("ALTER TABLE ".$current_project.".datasets 
+			ADD INPSYTE__PPT_ID VARCHAR(50)	DEFAULT NULL, 
+			ADD INPSYTE__PPT_TRUE_ID VARCHAR(50)	DEFAULT NULL,
+			ADD INPSYTE__SESSION_ID VARCHAR(10) DEFAULT NULL");
 
-    # create the headers
-    for ($j=0; $j<count($headers); $j++) {
-        $result = mysql_query("ALTER TABLE ".$current_project.".".$ppt_id." ADD ".$headers[$j]." VARCHAR(30)");
-    }
+		$result =mysql_query("ALTER TABLE ".$current_project.".datasets ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
+		
+		// add index for speed - this column will be need to be set by the user in the future
+		// now a composite index for more speed in joins
+        $index = mysql_query("ALTER TABLE ".$current_project.".datasets 
+        	ADD INDEX INPSYTE__PPT_ID (INPSYTE__PPT_ID, TRIAL_INDEX)");           
+	}
 
-    $result = mysql_query("ALTER TABLE ".$current_project.".".$ppt_id." DROP dummy");
+	
 
     $filename_full = addslashes($dir."/".$ppt_id.".txt");
 
     $result = mysql_query("LOAD DATA LOCAL INFILE '".$filename_full."'
-        INTO TABLE ".$current_project.".".$ppt_id."
+        INTO TABLE ".$current_project.".datasets
         FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\r\n' IGNORE 1 LINES");
     if(mysql_error()) { echo mysql_error(); exit();}
-
-    $result =mysql_query("ALTER TABLE ".$current_project.".".$ppt_id." ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
-
-    //set ppt_id as recording session label
-    $result =mysql_query("UPDATE ".$current_project.".".$ppt_id." set RECORDING_SESSION_LABEL='".$ppt_id."'");
-
+    
 }
 
 

@@ -171,19 +171,19 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	ENGINE=MyISAM
 	ROW_FORMAT=DEFAULT");
 
-  $result=mysql_query("CREATE TABLE ".$_GET['project'].".completed_runner_list (
+  /*$result=mysql_query("CREATE TABLE ".$_GET['project'].".completed_runner_list (
 	`ppt_id` VARCHAR(20) NULL DEFAULT NULL,
 	`runner` VARCHAR(20) NULL DEFAULT NULL)
 	COLLATE='latin1_swedish_ci'
 	ENGINE=MyISAM
-	ROW_FORMAT=DEFAULT");
+	ROW_FORMAT=DEFAULT");*/
 
-  $result=mysql_query("CREATE TABLE ".$_GET['project'].".output (
+  /*$result=mysql_query("CREATE TABLE ".$_GET['project'].".output (
 	`ppt_id` VARCHAR(10) NULL DEFAULT NULL,
 	UNIQUE INDEX `ppt_id` (`ppt_id`))
 	COLLATE='latin1_swedish_ci'
 	ENGINE=MyISAM
-	ROW_FORMAT=DYNAMIC");
+	ROW_FORMAT=DYNAMIC");*/
 
   $result=mysql_query("CREATE TABLE ".$_GET['project'].".participants (
 	`ppt_id` VARCHAR(10) NULL DEFAULT '0',
@@ -267,7 +267,7 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	`trial` VARCHAR(10) NOT NULL,
 	`search_text` VARCHAR(20) NOT NULL,
 	`temporal_order` VARCHAR(10) NOT NULL,
-	`value` INT(10) NOT NULL,
+	`value` INT(10) NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	INDEX `trial` (`trial`))
 	COLLATE='latin1_swedish_ci'

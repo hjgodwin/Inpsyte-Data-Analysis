@@ -36,44 +36,44 @@ if ($_GET['refresh']=='output_list_form'){
     echo "<script>select_all(true);</script>";
 }
 
-if (isset($_GET['run_analyses'])){
-      
-      parse_str(urldecode($_SERVER['QUERY_STRING']), $analyses);
-      array_shift($analyses); // remove first item from array which is run_analyses, we only want checkboxes
-      
-      // run through the checkboxes and stuff now.
-      foreach($analyses as $analysis){
-          
-        // get all the ppt ids  
-        $participant_array = single_column_array_builder("".$current_project.".participants", "ppt_id");
-        
-        foreach ($participant_array as $participant){
-          
-          // calculate the value for insertion into the output table  
-          $average_query = mysql_query("SELECT AVG(".$analysis.") 
-            FROM ".$current_project.".aggregated_trials WHERE ppt_id='".$participant."'");  
-    
-          while($average_row = mysql_fetch_array($average_query)){
-            $average = $average_row[0];
-            
-            //add the value to the output table
-            $update_output = mysql_query("UPDATE ".$current_project.".output 
-              SET ".$analysis."='".$average."' WHERE ppt_id='".$participant."'");
-  
-          }
-          echo $participant; 
-          echo $analysis; 
-          echo $average;
-          
-        }
-      }
-}
 
 if ($_GET['refresh']=='output_view'){
   
+  //
+  // begin by creating pivot table from analyses_output table
+  //
+  
+  // get full list of analyses
+  $result = mysql_query("SELECT name from ".$current_project.".analyses_list");
+  
+  while($row = mysql_fetch_array($result))
+        {$analyses_list[]=$row[0];}
+  
+  // get full list of sessions
+    $result = mysql_query("SELECT name from ".$current_project.".session_list");
+  
+  while($row = mysql_fetch_array($result))
+        {$session_list[]=$row[0];}
+  
+  // now build pivot table query
+  $result = mysql_query("DROP TABLE IF EXISTS ".$current_project.".output");
+  
+  $output_trunk = " CREATE TABLE ".$current_project.".output AS SELECT participant ";
+  
+  foreach($analyses_list as $analysis){
+  	foreach ($session_list as $session) {
+  		$output_trunk.=", avg(if(session_id = '".$session."' and runner='".$analysis."', value, NULL)) 
+	  		AS ".$analysis."_".$session."";	
+  	}
+  }
+  
+  $output_trunk .= " FROM ".$current_project.".analyses_output GROUP BY participant ";
+  
+  $result=mysql_query($output_trunk);
+  
   echo "<div>";
   
-  table_builder("".$current_project.".output");
+  table_builder($current_project.".output");
   
   echo "</div>";
   

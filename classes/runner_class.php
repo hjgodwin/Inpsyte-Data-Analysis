@@ -71,7 +71,7 @@ class runner_control {
   function select_and_run(){
     	
 	$need_more_runners = false;	
-		
+	
 	// if this is an analysis, we need to work otu if responses and time periods have been run yet
 	// if they have not, we force the user to go back and run them first
 	if ($this->runner_interface->runner_type=='analyses'){
@@ -82,21 +82,21 @@ class runner_control {
 		
 		// we then do a right join for responses which returns a count of how many participants
 		// have responses that are not yet run	
-		$runner_select= mysql_query("select count(c.ppt_id), r.*,  @participants 
-			from ".$this->runner_interface->current_project.".completed_runner_list as c
+		$runner_select= mysql_query("select count(distinct(c.ppt_id)), r.*,  @participants 
+			from ".$this->runner_interface->current_project.".responses_output as c
 			right join ".$this->runner_interface->current_project.".responses_list as r on (r.name = c.runner)
 			group by r.name");	
-		
+
 		// sets to refuse running if necessary
 		while($runner_row = mysql_fetch_array($runner_select))
       		{if($runner_row[0]<$runner_row[2]){$need_more_runners=true;}}	
 	
 		// now we do the same again but with time periods instead
-		$runner_select= mysql_query("select count(c.ppt_id), r.*,  @participants 
-			from ".$this->runner_interface->current_project.".completed_runner_list as c
+		$runner_select= mysql_query("select count(distinct(c.ppt_id)), r.*,  @participants 
+			from ".$this->runner_interface->current_project.".time_periods_output as c
 			right join ".$this->runner_interface->current_project.".time_periods_list as r on (r.name = c.runner)
 			group by r.name");	
-		
+				
 		// sets to refuse running if necessary
 		while($runner_row = mysql_fetch_array($runner_select))
       		{if($runner_row[0]<$runner_row[2]){$need_more_runners=true;}}	
@@ -105,41 +105,34 @@ class runner_control {
 		
 		
 	// select participatns who need this to be run	
-    $participant_select = "SELECT participants.ppt_id FROM ".$this->runner_interface->current_project.".participants 
+    /*$participant_select = "SELECT participants.ppt_id FROM ".$this->runner_interface->current_project.".participants 
     WHERE participants.ppt_id NOT IN 
     (SELECT ppt_id FROM ".$this->runner_interface->current_project.".completed_runner_list WHERE runner='".$this->runner_interface->name."')";
+   
+   	echo $participant_select;
    
     $participant_result = mysql_query($participant_select);
 
 	
     while($row = mysql_fetch_array($participant_result)){         
         $participant_array[]=$row['ppt_id'];
-    }
+    }*/
+	
+	// hack to test things
+	$need_more_runners=false;
+	
     // run the real thing
-    if(count($participant_array)>0 && $need_more_runners==false){
-    	
-		// draw loading logo
-		/*echo "<div id='loading'>Inpsyte Data Analysis is processing your request. This may take some time depeding upon the complexity 
-		of your request, and the amount of data that needs to be processed.
-		<br> <img src='css/3dmoonanimation.gif' width=50 height=50></div>";*/
-		    
-        foreach ($participant_array as $ppt){
+    //if(count($participant_array)>0 && $need_more_runners==false){
+    if ($need_more_runners==false){
+		$begin_array = explode(' ', microtime() );
+		$start = $begin_array[1] + $begin_array[0];
 
-            $this->participant = $ppt;
-            
-            $begin_array = explode(' ', microtime() );
-            $start = $begin_array[1] + $begin_array[0];
+		$this->runner();
 
-            $this->runner();
+		$end_array = explode(' ', microtime() );
+    	$total_time = round(($end_array[0] +  $end_array[1] - $start),6);
 
-            $end_array = explode(' ', microtime() );
-            $total_time = round(($end_array[0] +  $end_array[1] - $start),6);
-
-            echo "<br>".$ppt." running completed. Operation took ".$total_time. " to complete.";
-        }
-		
-		echo "All calculations complete.";
-		
+    	echo "<br>Running completed. Operation took ".$total_time. " to complete.";
     }
 
     if(count($participant_array)==0 && $need_more_runners==false){echo "Those have already been run!";}  
@@ -147,19 +140,21 @@ class runner_control {
 	if($need_more_runners==true) {echo "Can not run analysis. You need to make sure you have run all time
 		periods and responses before running analyses.";}
   }  
-  
-  function column_reset(){ 
-    // remove and re-insert key headings for this analysis
-    $result=mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".".$this->participant." 
-        DROP ".$this->runner_interface->runner_type."_".$this->runner_interface->name."");
-    $result=mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".".$this->participant." 
-        DROP ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include");
-             
-    $result=mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".".$this->participant." 
-        ADD COLUMN ".$this->runner_interface->runner_type."_".$this->runner_interface->name." VARCHAR(50)");
-    $result=mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".".$this->participant." 
-        ADD COLUMN ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include VARCHAR(50)");  
-}
+  /*
+  function column_reset(){
+   
+   $result=mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets 
+        DROP COLUMN ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include INT(10)");
+	   	 
+   $result=mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets 
+        ADD COLUMN ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include INT(10)");
+		
+	// add index for speed - this column will be need to be set by the user in the future
+        $index = mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets 
+        	ADD INDEX ".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include
+        	 (".$this->runner_interface->runner_type."_".$this->runner_interface->name."_include)"); 
+	  
+}*/
   
   function runner (){
 
@@ -169,38 +164,20 @@ class runner_control {
         // work out true id of participant
         $this->current_true_ppt_id = $this->get_current_true_participant_id($this->participant);
 
-        // remove and re-insert key headings for this analysis
-        $this->column_reset();
-        
+		// get runner attribs        
         $this->runner_data = $this->runner_interface->get_runner_attribs($this->runner_interface->name);
  
         // build the query to select the appropriate rows
+        // also inserts averages per trial into X_output.
         $this->selection_query();
 
         $result=mysql_query($this->restriction_query); if(mysql_error){echo mysql_error();}
 
-        // build query to output values to runner_ouput table.
-        $this->runner_output_query();
-        $runner_query = mysql_query($this->runner_query_string); if(mysql_error){echo mysql_error();}
-
-        if ($this->generate_output==true){ // this selects analyses only
-          /// excel output table
-          $output_query_string= "UPDATE ".$this->runner_interface->current_project.".output 
-            SET ".$this->runner_interface->name."_".$this->current_session."=(SELECT AVG(value) 
-             FROM ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output WHERE ppt_id='".$this->participant."' 
-                 AND runner = '".$this->runner_interface->name."') 
-            WHERE ppt_id='".$this->current_true_ppt_id."'";
-        
-        //echo $output_query_string;
-        
-        $output_query = mysql_query($output_query_string); 
-        }
-
-        if ($this->dummy_run==false){
+        //if ($this->dummy_run==false){
           // set this as having been done on the output list
-          $completed = mysql_query("INSERT INTO ".$this->runner_interface->current_project.".completed_runner_list (ppt_id, runner)
-            VALUES ('".$this->participant."', '".$this->runner_interface->name."')");
-        }
+        //  $completed = mysql_query("INSERT INTO ".$this->runner_interface->current_project.".completed_runner_list (ppt_id, runner)
+       //     VALUES ('".$this->participant."', '".$this->runner_interface->name."')");
+        //}
     }
 
 }
