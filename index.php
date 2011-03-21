@@ -30,10 +30,6 @@ if(isset($_GET["viewer"])){  $content = $_GET["viewer"]; }
 if(!file_exists($content.".php"))
   {
   echo "<h1>Error: Requested Page does not Exist</h1>";
-  echo "<div class='ui-state-error ui-corner-all' style='width:50%; height:50px;'> 
-        <p><span class='ui-icon ui-icon-alert' style='float: left;'></span> 
-        <strong>Alert:</strong> Sample ui-state-error style.</p>
-      </div>";
   echo "<p>Sorry but the page you requested does not exist.</p>";
   }
 
