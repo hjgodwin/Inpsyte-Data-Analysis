@@ -403,7 +403,7 @@ class edit_control {
 include("edit_analyses.php");
 include("edit_responses.php");
 include("edit_time_periods.php");
-include("edit_custom.php");
+
 
 ?>
 
