@@ -2,107 +2,88 @@
  <head> 
   <title>Inpsyte Data Analysis</title> 
  
-  <link type="text/css" rel="stylesheet" href="css/ge2.css"> 
+  <link type="text/css" rel="stylesheet" href="css/ida.css"> 
   <link type="text/css" href="css/black-tie/jquery-ui-1.8.9.custom.css" rel="stylesheet"> 
   <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script> 
   <script type="text/javascript" src="js/jquery-ui-1.8.9.custom.min.js"></script> 
    
-   
- <script>
-			$().ready(function() {
-				
-				$('#edit').click(toggle_column);
-				$('#run').click(toggle_column);
-				$('#output').click(toggle_column);
-				$('#help').click(toggle_column);
-
- 			});
- 			
- 			function toggle_column(){
- 			
- 				if( $('#run_dropdown').is(':visible') && this.id != 'run' ) {
-    				hide_column('#run_dropdown');
-				}
-						
- 				if( $('#edit_dropdown').is(':visible') && this.id != 'edit' ) {
-    				hide_column('#edit_dropdown');
-				}
-				
-				if( $('#output_dropdown').is(':visible') && this.id != 'output' ) {
-    				hide_column('#output_dropdown');
-				}
-				
-				if( $('#help_dropdown').is(':visible') && this.id != 'help' ) {
-    				hide_column('#help_dropdown');
-				}
- 			
- 				var hovername = '#'+this.id+'_dropdown'; 			
- 				$(hovername).slideToggle('slow', function() {});
- 				
- 			}
- 			
- 			function hide_column(column){		
- 				$(column).hide();		
- 			}
- 			
-		  </script>
-
 </head> 
  
 <body> 
   
- <div id = 'header'>
  
+  
+
+ 
+<div id = 'containing_div'>
+ <div id = 'header'>
 	<div id='navigation'>
 		<ul>
-		<li id='edit'><a href='#'>EDIT <img src='css/triangle.png'></a></li>
-		<li id='run'><a href='#'>RUN <img src='css/triangle.png'></a></li>
-		<li id='output'><a href='#'>OUTPUT <img src='css/triangle.png'></a></li>
-		<li id='help'><a href='#'>HELP <img src='css/triangle.png'></a></li>
+		<li 
+		<?php if ($pagegroup=='projects'){ echo "id='current'";} ?> >
+			<a href='index.php?pagegroup=projects&viewer=overview'>PROJECTS </a></li>
+		<li
+		<?php if ($pagegroup=='edit'){ echo "id='current'";} ?> >
+			<a href='index.php?pagegroup=edit&viewer=overview'>SETUP </a></li>
+		<li
+		<?php if ($pagegroup=='run'){ echo "id='current'";} ?> >
+			<a href='index.php?pagegroup=run&viewer=overview'>RUN </a></li>
+		<li
+		<?php if ($pagegroup=='output'){ echo "id='current'";} ?> >
+			<a href='index.php?pagegroup=output&viewer=overview'>OUTPUT </a></li>
+		<li
+		<?php if ($pagegroup=='help'){ echo "id='current'";} ?> >
+			<a href='index.php?pagegroup=help&viewer=overview'>HELP </a></li>
 		</ul>
-		
- 		<div id='edit_dropdown' style='display:none;'>
- 			<ul>
- 				<li><a href='index.php?viewer=participants'>Participants</a></li>
- 				<li><a href='index.php?viewer=edit&table=responses'>Responses</a></li>
- 				<li><a href='index.php?viewer=edit&table=time_periods'>Time Periods</a></li>
- 				<li><a href='index.php?viewer=edit&table=analyses'>Analyses</a></li>
- 			</ul> 			
- 		</div>
-
-		
-		
- 		<div id='run_dropdown' style='display:none;'>
- 			<ul>
- 				<li><a href='index.php?viewer=run&table=responses'>Responses</a></li>
- 				<li><a href='index.php?viewer=run&table=time_periods'>Time Periods</a></li>
- 				<li><a href='index.php?viewer=run&table=analyses'>Analyses</a></li>
- 			</ul> 			
- 		</div>
- 		
- 		<div id='output_dropdown' style='display:none;'>
- 			<ul>
- 				<li><a href='index.php?viewer=view_trials'>View Trials</a></li>
- 				<li><a href='index.php?viewer=inspect'>Inspect Data</a></li>
- 				<li><a href='index.php?viewer=output'>Output</a></li>
- 				<li><a href='index.php?viewer=histograms'>Histograms</a></li>
- 			</ul> 			
- 		</div>
- 		
- 		
-		
- 		<div id='help_dropdown' style='display:none;'>
- 			<ul>
- 				<li><a href='http://inpsyte.psychwire.co.uk'>Help files</a></li>
- 		
- 			</ul> 			
- 		</div>
- 		
- 	</div>
-   
+ 	</div> 
  </div>
- 
-<br><br><br><br>
+<div id='nav_column'> 
+	<ul>
+		
+		<?php 
+		if ($pagegroup=='projects'){
+			echo ""; /* Some placeholders for furture development
+			<li><a href='newip.html'>Add Project</a></li>
+			<li><a href='newip.html'>Delete Project</a></li>
+			<li><a href='newip.html'>Copy Project</a></li>";*/
+		}
+
+		if ($pagegroup=='edit'){
+			echo "<li><a href='index.php?pagegroup=edit&viewer=participants'>Participants</a></li>
+ 				<li><a href='index.php?pagegroup=edit&viewer=edit&table=responses'>Responses</a></li>
+ 				<li><a href='index.php?pagegroup=edit&viewer=edit&table=time_periods'>Time Periods</a></li>
+ 				<li><a href='index.php?pagegroup=edit&viewer=edit&table=analyses'>Analyses</a></li>
+ 				<li><a href='index.php?pagegroup=edit&viewer=edit&table=custom'>Custom</a></li>";
+		}
+		
+		if ($pagegroup=='run'){
+			echo "<li><a href='index.php?pagegroup=run&viewer=run&table=responses'>Responses</a></li>
+ 				<li><a href='index.php?pagegroup=run&viewer=run&table=time_periods'>Time Periods</a></li>
+ 				<li><a href='index.php?pagegroup=run&viewer=run&table=analyses'>Analyses</a></li>
+ 				<li><a href='index.php?pagegroup=run&viewer=run&table=custom'>Custom</a></li>";
+		}
+		
+		if ($pagegroup=='output'){
+			//echo "<li><a href='index.php?pagegroup=output&viewer=view_trials'>View Trials</a></li>
+ 				echo "
+ 				<li><a href='index.php?pagegroup=output&viewer=output'>Output</a></li>
+ 				<li><a href='index.php?pagegroup=output&viewer=histograms'>Histograms</a></li>
+ 				<li><a href='index.php?pagegroup=output&viewer=inspect'>Inspect Data</a></li>";
+		}
+		
+		if ($pagegroup=='help'){
+			echo "";
+		}		
+		
+		?>
+		
+		
+		
+		
+	</ul>
+	
+
+</div>
+
 <div id='maintext'> 
-
-
+	

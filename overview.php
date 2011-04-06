@@ -18,31 +18,30 @@
     along with Inpsyte Data Analysis.  If not, see <http://www.gnu.org/licenses/>. 
  */ //////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Includes for database connection as well as first paragraph and first heading for each page
-include("conf/conf.php");
 
-if(!isset($_GET["viewer"])){ $content='overview'; }
-if(isset($_GET["viewer"])){  $content = $_GET["viewer"]; }
+if($pagegroup=="projects"){
+	include("projects.php");
+}
 
-if(!isset($_GET["pagegroup"])){ $pagegroup='projects'; }
-if(isset($_GET["pagegroup"])){  $pagegroup = $_GET["pagegroup"]; }
+if($pagegroup=="edit"){
+	echo "<h1>Setup</h1>";
+	echo "You can use the pages in this section to setup ways to analyse your data.";
+}
 
-include("include/header.php");
-include("functions/table_builder.php");
-include("functions/single_column_array_builder.php");
+if($pagegroup=="run"){
+	echo "<h1>Run</h1>";
+	echo "You can use the pages in this seciton to produce output from your data.";
+}
 
-if(!file_exists($content.".php"))
-  {
-  echo "<h1>Error: Requested Page does not Exist</h1>";
-  echo "<p>Sorry but the page you requested does not exist.</p>";
-  }
+if($pagegroup=="output"){
+	echo "<h1>Output</h1>";
+	echo "You can use the pages in this section to examine your output in detail.";
+}
 
-else
-  {
-  include($content.".php");
-  }
+if($pagegroup=="help"){
+	echo "<h1>Help</h1>";
+	echo "There's nothing here.";
+}
 
-
-include("include/footer.php");
 
 ?>

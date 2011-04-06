@@ -272,6 +272,33 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	INDEX `ppt_id` (`ppt_id`, `trial`))
 	ENGINE=MyISAM");
  
+ $result=mysql_query("CREATE TABLE ".$_GET['project'].".custom_list (
+	`name` VARCHAR(20) NULL DEFAULT NULL COMMENT 'Analysis Name'
+	)");
+
+
+ $result=mysql_query("CREATE TABLE ".$_GET['project'].".custom_output (
+	`id` INT(11) NOT NULL,
+	`runner` VARCHAR(20) NOT NULL,
+	`label` VARCHAR(50) NOT NULL,
+	`ppt_id` VARCHAR(15) NOT NULL,
+	`participant` VARCHAR(15) NOT NULL,
+	`session_id` VARCHAR(15) NOT NULL,
+	`trial` VARCHAR(10) NOT NULL,
+	`value` VARCHAR(30) NOT NULL,
+	INDEX `id` (`id`)
+	)");
+
+ 
+ $result=mysql_query("CREATE TABLE ".$_GET['project'].".custom_attrib (
+	`id` INT(10) NOT NULL AUTO_INCREMENT,
+	`runner_type` VARCHAR(20) NOT NULL,
+	`runner_name` VARCHAR(20) NOT NULL,
+	`attribute_name` VARCHAR(100) NOT NULL,
+	`value` VARCHAR(100) NOT NULL,
+	PRIMARY KEY (`id`)
+	)");
+
  
 }
 

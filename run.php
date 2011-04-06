@@ -47,6 +47,11 @@ if ($_GET['table']=='responses'){
   </div>"; 
 }
 
+if ($_GET['table']=='custom'){
+  echo "<div><h1>Run Custom Analyses</h1>
+  </div>"; 
+}
+
 echo "<div id='interactive_table'>";
 
 echo "</div>";
@@ -62,9 +67,6 @@ echo "<div id='delete_popup_output'></div>";
 
 echo "</div>";
 
-// make this into an interactive popup.
-
-//echo "<div><h1>Test Analysis</h1></div>";
 echo "<div id='table_demo' style='display:none'>";
 echo "</div>";
 

@@ -46,21 +46,21 @@ if ($table_type=='empty'){
 if ($table_type!='empty'){
 	
 	if ($table_type=='analyses'){
-	  echo "<div><h1>Edit Analyses</h1>
+	  echo "<div><h1>Setup Analyses</h1>
 	  Analyses are used to create means for output (e.g. average time spent on a task).
 	  </div>"; 
 	}
 	
 	
 	if ($table_type=='time_periods'){
-	  echo "<div><h1>Edit Time Periods</h1>
+	  echo "<div><h1>Setup Time Periods</h1>
 	  Time periods are specific to eye tracking experiments and can be used to chart multiple events
 	  within a single trial, such as the appearance or disappearance of a given display.
 	  </div>"; 
 	}
 	
 	if ($table_type=='responses'){
-	  echo "<div><h1>Edit Responses</h1>
+	  echo "<div><h1>Setup Responses</h1>
 	  The responses are currently set up to be specific for eye tracking studies. Contact me if you want to 
 	  examine different forms of responses. Note that many forms of experimental software output responses
 	  in a specific column in the data, so you may be able to access the required information already for the
@@ -68,6 +68,12 @@ if ($table_type!='empty'){
 	  </div>"; 
 	}
 
+	if ($table_type=='custom'){
+	  echo "<div><h1>Setup Custom Analyses</h1>
+	  
+	  </div>"; 
+	}	
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 	echo "<div id='interactive_table'>";

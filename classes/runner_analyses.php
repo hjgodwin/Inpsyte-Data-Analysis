@@ -59,11 +59,7 @@ class runner_analyses extends runner_control {
     // used to check whether temporary table currently exists or not.
     $result=@mysql_query("SELECT * FROM ".$this->runner_interface->current_project.".datasets_aggregated 
     	WHERE ppt='".$this->participant."' LIMIT 1");
-    
-	//echo "<Br>";
-	//echo "SELECT * FROM ".$this->runner_interface->current_project.".datasets_aggregated 
-    //	WHERE ppt='".$this->participant."' LIMIT 1";
-	
+    	
     $exists = false;
     
     while($row = @mysql_fetch_array($result)){
@@ -141,10 +137,6 @@ class runner_analyses extends runner_control {
 	
 	// add indices for speed
 	if($type=='create'){
-		// add index for speed - this column will be need to be set by the user in the future
-	//	$result =mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets_aggregated 
-	//		ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY"); if(mysql_error){echo mysql_error();}
-				
         $index = mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets_aggregated 
         	ADD INDEX trial_index (trial_index),
         	ADD INDEX INPSYTE__PPT_ID (INPSYTE__PPT_ID)"); if(mysql_error){echo mysql_error();}
@@ -281,13 +273,33 @@ class runner_analyses extends runner_control {
   
  function selection_query(){
 	
+	//////////////
+	//
+	// 	THIS HANDLES BOTH NORMAL AND CUSTOM ANALYSES. THEY HAVE A LOT OF OVERLAP.
+	//
+	//////////////
+	
     //$this->dummy_run=true;
     
-    // this will be different for each runner type
-    $this->computation = $this->runner_data['computation'];
-    $this->input_column = $this->runner_data['input_column'];
-    $this->group_by = $this->runner_data['group_by'];
-
+    if ($this->runner_interface->runner_type=='analyses'){
+    	$this->computation = $this->runner_data['computation'];
+    	$this->input_column = $this->runner_data['input_column'];
+    	$this->group_by = $this->runner_data['group_by'];
+	}
+    
+	if ($this->runner_interface->runner_type=='custom'){
+			
+		$this->generate_output=false;
+		
+	    $this->custom_label = $this->runner_data['custom_label']; 
+		$this->output_type = $this->runner_data['output_type'];
+		$this->computation = $this->runner_data['computation'];
+	    $this->input_column = $this->runner_data['input_column'];
+		$this->output_value = $this->runner_data['output_value'];
+		$this->output_text = $this->runner_data['output_text'];
+		$this->output_manual = $this->runner_data['output_manual'];
+	}
+    
     // set up info for time periods, inc full list and temporal order
     $this->get_time_periods_info();
 	
@@ -307,83 +319,106 @@ class runner_analyses extends runner_control {
     if ($this->aggregated_table_exists==false){
       $this->aggregated_table("create");
     }
+
+	if ($this->runner_interface->runner_type=='analyses'){ 		
+		// these are for standard computations
+	    if (!strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
+	      $this->computation_string = $this->computation."(".$this->input_column.")";
+	    }
+	    if (strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
+	      $this->computation_string = "COUNT(DISTINCT(".$this->input_column."))";
+	    }
 		
-	// if it exists, we check if this ppt is part of it already
-	//$this->ppt_aggregated = $this->get_ppt_aggregated();
-    //if ($this->ppt_aggregated==false){
-    //  $this->aggregated_table("insert");
-    //}
+		// this is used to shave times off fixation durations that occur as part of multiple time periods
+		if (count($this->time_period_list)>0 && strtolower($this->input_column)=='current_fix_duration'
+			&& $this->computation=='avg'){
+			$this->computation_string = 
+			"AVG(
+			  CASE
+				WHEN (cast(p.current_fix_start as signed) 
+					between cast(a.".$this->first_time_period_selected." as signed) 
+		  				and cast(a.".$this->final_time_period_selected." as signed)) 
+		  		    and (cast(p.current_fix_end as signed) between
+		  		    	cast(a.".$this->first_time_period_selected." as signed) 
+		   				and cast(a.".$this->final_time_period_selected." as signed)) 
+		   		THEN p.current_fix_duration
 	
-	// these are for standard computations
-    if (!strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
-      $this->computation_string = $this->computation."(".$this->input_column.")";
-    }
-    if (strstr($this->computation, 'COUNT DISTINCT') && $this->input_column!=''){
-      $this->computation_string = "COUNT(DISTINCT(".$this->input_column."))";
-    }
-
-	// this is used to shave times off fixation durations that occur as part of multiple time periods
-	if (count($this->time_period_list)>0 && strtolower($this->input_column)=='current_fix_duration'
-		&& $this->computation=='avg'){
-		$this->computation_string = 
-		"AVG(
-		  CASE
-			WHEN (cast(p.current_fix_start as signed) 
-				between cast(a.".$this->first_time_period_selected." as signed) 
-	  				and cast(a.".$this->final_time_period_selected." as signed)) 
-	  		    and (cast(p.current_fix_end as signed) between
-	  		    	cast(a.".$this->first_time_period_selected." as signed) 
-	   				and cast(a.".$this->final_time_period_selected." as signed)) 
-	   		THEN p.current_fix_duration
-
-			WHEN (cast(p.current_fix_start as signed) 
-				between cast(a.".$this->first_time_period_selected." as signed) 
-	  				and cast(a.".$this->final_time_period_selected." as signed)) 
-	  			and (cast(p.current_fix_end as signed) > 
-	  				cast(a.".$this->final_time_period_selected." as signed)) 
-	  		THEN cast(a.".$this->final_time_period_selected." as signed) - cast(p.current_fix_start as signed)
-
-			WHEN (cast(p.current_fix_start as signed) 
-				< cast(a.".$this->first_time_period_selected." as signed)) 
-	  			and (cast(p.current_fix_end as signed) 
-	  				between cast(a.".$this->first_time_period_selected." as signed) and 
-	  				cast(a.".$this->final_time_period_selected." as signed))
-	  		THEN cast(p.current_fix_end as signed) - cast(a.".$this->first_time_period_selected." as signed)
-
-			WHEN (cast(p.current_fix_start as signed) 
-				< cast(a.".$this->first_time_period_selected." as signed)) 
-	   			and (cast(p.current_fix_end as signed) 
-	   				> cast(a.".$this->final_time_period_selected." as signed)) 
-	   		THEN cast(a.".$this->final_time_period_selected." as signed)- cast(a.".$this->first_time_period_selected." as signed)
-
-		 END
-		)";
+				WHEN (cast(p.current_fix_start as signed) 
+					between cast(a.".$this->first_time_period_selected." as signed) 
+		  				and cast(a.".$this->final_time_period_selected." as signed)) 
+		  			and (cast(p.current_fix_end as signed) > 
+		  				cast(a.".$this->final_time_period_selected." as signed)) 
+		  		THEN cast(a.".$this->final_time_period_selected." as signed) - cast(p.current_fix_start as signed)
 	
+				WHEN (cast(p.current_fix_start as signed) 
+					< cast(a.".$this->first_time_period_selected." as signed)) 
+		  			and (cast(p.current_fix_end as signed) 
+		  				between cast(a.".$this->first_time_period_selected." as signed) and 
+		  				cast(a.".$this->final_time_period_selected." as signed))
+		  		THEN cast(p.current_fix_end as signed) - cast(a.".$this->first_time_period_selected." as signed)
+	
+				WHEN (cast(p.current_fix_start as signed) 
+					< cast(a.".$this->first_time_period_selected." as signed)) 
+		   			and (cast(p.current_fix_end as signed) 
+		   				> cast(a.".$this->final_time_period_selected." as signed)) 
+		   		THEN cast(a.".$this->final_time_period_selected." as signed)- cast(a.".$this->first_time_period_selected." as signed)
+	
+			 END
+			)";
+		
+		}
+	     
+		 $this->restriction_query = "INSERT INTO 
+		     ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output 
+		     (runner, ppt_id, participant, session_id, trial, value)
+		     SELECT '".$this->runner_interface->name."', p.INPSYTE__PPT_ID,
+		     p.INPSYTE__PPT_TRUE_ID, p.INPSYTE__SESSION_ID, p.".$this->group_by.",
+		     ".$this->computation_string." 
+		     FROM ".$this->runner_interface->current_project.".datasets p
+		     JOIN ".$this->runner_interface->current_project.".datasets_aggregated as a on 
+		     p.INPSYTE__PPT_ID = a.INPSYTE__PPT_ID AND p.TRIAL_INDEX = a.trial_index
+		     ";
+	 }
+	 
+	 ////// build query trunk for custom
+	 if ($this->runner_interface->runner_type=='custom'){
+	 			
+	 	if($this->output_type=='calculation'){
+	 		$output_string = $this->input_column." ".$this->computation." ".$this->output_value;
+	 	}	
+		
+	 	if($this->output_type=='text'){
+	 		$output_string = " '".$this->output_text."' ";
+	 	}	
+		
+		if($this->output_type=='manual'){
+	 		$output_string = " ".$this->output_manual." ";
+	 	}	
+		
+		
+		$datasets_columns = header_array_builder($this->runner_interface->current_project.".datasets");
+		
+		if (!in_array($this->custom_label, $datasets_columns)){
+			$add = mysql_query("ALTER TABLE ".$this->runner_interface->current_project.".datasets
+				 ADD COLUMN ".$this->custom_label." VARCHAR(50) DEFAULT NULL");	
+			
+		}
+		
+		$this->restriction_query = "UPDATE ".$this->runner_interface->current_project.".datasets p
+		LEFT JOIN ".$this->runner_interface->current_project.".datasets_aggregated AS a 
+		ON p.INPSYTE__PPT_ID = a.INPSYTE__PPT_ID AND p.TRIAL_INDEX = a.trial_index
+		SET ".$this->custom_label." = ".$output_string."";
+		
 	}
-     
-	 $this->restriction_query = "INSERT INTO 
-	     ".$this->runner_interface->current_project.".".$this->runner_interface->runner_type."_output 
-	     (runner, ppt_id, participant, session_id, trial, value)
-	     SELECT '".$this->runner_interface->name."', p.INPSYTE__PPT_ID,
-	     p.INPSYTE__PPT_TRUE_ID, p.INPSYTE__SESSION_ID, p.".$this->group_by.",
-	     ".$this->computation_string." 
-	     FROM ".$this->runner_interface->current_project.".datasets p
-	     join ".$this->runner_interface->current_project.".datasets_aggregated as a on 
-	     	p.INPSYTE__PPT_ID = a.INPSYTE__PPT_ID AND p.TRIAL_INDEX = a.trial_index";
 	 
-	 
-	//$this->restriction_query.= " WHERE p.INPSYTE__PPT_ID='".$this->participant."' ";
-	
-	//$this->where_written = true;
-    $this->where_written = false; // this was used before i set the WEHERE each time for the ppt_id
-
-    //print_r($this->runner_data);
+	// this is used for dynamic query generation
+    $this->where_written = false; 
 
     // handle various monstrous arrays - restrictions, responses, time periods, outcomes
     for ( $i = 1; $i <= count($this->runner_data); $i+= 1) {
        
        // handle infinite number of restrictions
-       if (array_key_exists('restriction_'.$i.'_column', $this->runner_data)){
+       if (array_key_exists('restriction_'.$i.'_type', $this->runner_data)){
          
           $this->add_where_check();
 
@@ -409,7 +444,13 @@ class runner_analyses extends runner_control {
             $this->restriction_query .= " CAST("."p.".$this->runner_data['restriction_'.$i.'_column']." AS SIGNED) ".
               $this->runner_data['restriction_'.$i.'_symbol'].
               " CAST(".$this->runner_data['restriction_'.$i.'_text']." AS SIGNED) ";
-          }          
+          }
+          
+          // manual restrictions
+          if ($this->runner_data['restriction_'.$i.'_type']=='manual'){
+          	$this->restriction_query .= $this->runner_data['restriction_'.$i.'_manual'];
+		  }
+          
         }
 
         // if we have selected specific response(s) to look at
@@ -437,9 +478,11 @@ class runner_analyses extends runner_control {
       // now select only trials where all events occurred
       // note this only counts for analyses where the user asked to look at events in some shape or form
       $this->select_time_period_trials_join_lister($this->time_period_list);
-      
-	  // close up and group by	  
-	  $this->restriction_query.= " GROUP BY p.INPSYTE__PPT_ID, p.TRIAL_INDEX ";
+      	  
+	  // close up and group by - not for custom analyses though
+	  if ($this->runner_interface->runner_type=='analyses'){ 
+	  	$this->restriction_query.= " GROUP BY p.INPSYTE__PPT_ID, p.TRIAL_INDEX ";
+	  }
 	  
       ECHO "<BR>";
       echo $this->restriction_query;

@@ -38,6 +38,11 @@ if ($_GET['runner_type']=='time_periods'){
   $edit_controller = new edit_time_periods($current_project);
 }
 
+if ($_GET['runner_type']=='custom'){
+  $edit_controller = new edit_analyses($current_project);
+}
+
+
 // updates list table
 if ($edit_controller->action=='refresh' && $edit_controller->action_value=='interactive_table'){
     $edit_controller->interactive_table();
@@ -45,7 +50,7 @@ if ($edit_controller->action=='refresh' && $edit_controller->action_value=='inte
 
 // special for analysis popup       
 if ($edit_controller->action=='show_popup' || $edit_controller->action=='change_restrictions' 
-  || $edit_controller->action=='change_pairs'){
+  || $edit_controller->action=='change_custom_type' || $edit_controller->action=='change_restriction_type'){
   $edit_controller->popup();
 }
 

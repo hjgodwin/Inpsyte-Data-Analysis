@@ -48,30 +48,90 @@ function import_tabbed_file ($ppt_id, $dir){
 	    $firstline = $fcontents[0];
 	    $headers = explode("\t", $firstline);
 	
+		// now that we have the headers, we need to check the following:
+		// 1) that there are no duplicates
+		// 2) that the header names don't conflict with anything that we need (i.e., 'id')
+		
+		// this will be the list of headers actually created
+		$final_header_list = array();
+	
+		// this is the list of reserved headers that can't be created
+		$reserved_header_list = array('id');
+		
+		foreach($headers as $header){
+			
+			$header = trim($header);
+			
+			//echo $header; 
+			//echo "<br>";
+			
+			if(!in_array($header, $final_header_list) && !in_array($header, $reserved_header_list)){
+				$new_name_needed = false;
+			}
+			
+			if((in_array($header, $final_header_list) || in_array($header, $reserved_header_list))){
+				$new_name_needed = true;	
+			}
+			
+			if ($new_name_needed == false){
+				$final_header_list[] = $header;					
+			}
+			
+			if ($new_name_needed == true){
+			 
+			 	$new_header = 'EMPTY_HEADER';
+			 
+			 	//echo "trying to add new header...<br>";
+			 
+			 	$header_increment = 1;		 	
+			
+			    for ( $header_increment = 1; $header_increment <= 1000; $header_increment += 1) {
+					
+					//echo $header_increment." generating new header<br>";				
+					$new_header = $header .'_'.$header_increment;
+					
+					if (!in_array($new_header, $final_header_list) && !in_array($new_header, $reserved_header_list)){
+						$final_header_list[] = $new_header;
+						break;
+					}
+				}
+								
+			}						
+		}
+		
 		$header_query = "ALTER TABLE ".$current_project.".datasets ";
+		
+	    $one_added = false;
+		
+	    foreach ($final_header_list as $header){
+	    	if (strlen($header)>0){
+		    	if ($one_added == true){
+		    		$header_query.=", ";
+				}	
+				$header_query.="  ADD ".$header." VARCHAR(30)";
+				$one_added = true;
+			}
+	    };
 	
-	    # create the headers
-	    for ($j=0; $j<count($headers); $j++) {
-	        if ($j>0){$header_query.=", ";}	
-	        $header_query.="  ADD ".$headers[$j]." VARCHAR(30)";
-	    }
+
+		// echo $header_query;
 	
-		$result = mysql_query($header_query);
+		$result = mysql_query($header_query); if(mysql_error()) { echo mysql_error(); exit();}
 	
-	    $result = mysql_query("ALTER TABLE ".$current_project.".datasets DROP dummy");
+	    $result = mysql_query("ALTER TABLE ".$current_project.".datasets DROP dummy"); if(mysql_error()) { echo mysql_error(); exit();}
 
 		// session and ppt_id columns added here
 		$result = mysql_query("ALTER TABLE ".$current_project.".datasets 
 			ADD INPSYTE__PPT_ID VARCHAR(50)	DEFAULT NULL, 
 			ADD INPSYTE__PPT_TRUE_ID VARCHAR(50)	DEFAULT NULL,
-			ADD INPSYTE__SESSION_ID VARCHAR(10) DEFAULT NULL");
+			ADD INPSYTE__SESSION_ID VARCHAR(10) DEFAULT NULL"); if(mysql_error()) { echo mysql_error(); exit();}
 
-		$result =mysql_query("ALTER TABLE ".$current_project.".datasets ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY");
+		$result =mysql_query("ALTER TABLE ".$current_project.".datasets ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY"); if(mysql_error()) { echo mysql_error(); exit();}
 		
 		// add index for speed - this column will be need to be set by the user in the future
 		// now a composite index for more speed in joins
         $index = mysql_query("ALTER TABLE ".$current_project.".datasets 
-        	ADD INDEX INPSYTE__PPT_ID (INPSYTE__PPT_ID, TRIAL_INDEX)");           
+        	ADD INDEX INPSYTE__PPT_ID (INPSYTE__PPT_ID, TRIAL_INDEX)"); if(mysql_error()) { echo mysql_error(); exit();}          
 	}
 
 	

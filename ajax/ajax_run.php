@@ -39,6 +39,11 @@ if ($_GET['runner_type']=='time_periods'){
   $run_controller = new runner_time_periods($current_project);
 }
 
+if ($_GET['runner_type']=='custom'){
+  $run_controller = new runner_analyses($current_project);
+}
+
+
 //updates list table
 if ($run_controller->runner_interface->action=='refresh' && $run_controller->runner_interface->action_value=='interactive_table'){
     $run_controller->table_construct();

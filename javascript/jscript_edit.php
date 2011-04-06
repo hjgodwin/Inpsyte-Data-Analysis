@@ -20,15 +20,16 @@ function popup_display(add_or_edit, custom, name_to_edit, runner){
   is_custom: custom, 
   name: name_to_edit}, 
     function(data){
-    $("#runner_popup").html(data);});
+    $("#maintext").html(data);});
     
-  $( "#runner_popup" ).dialog({ modal: true, width:1000, height:900, position:'top', maxheight:900});
+  //$( "#runner_popup" ).dialog({ modal: true, width:1000, height:900, position:'top', maxheight:900});
   
   
 }
 
-function close_analysis_popup(){
-  $( "#runner_popup" ).dialog('close');
+function close_analysis_popup(table){
+  //$( "#runner_popup" ).dialog('close');
+  window.location.href = "index.php?pagegroup=edit&viewer=edit&table="+table;
 }
 
 function change_restrictions(add_or_edit, custom, runner_name, more_or_less, current_count){
@@ -42,25 +43,44 @@ function change_restrictions(add_or_edit, custom, runner_name, more_or_less, cur
        count: current_count,
        current_data : 'form&' + form_input
    }, 
-    function(data){$("#runner_popup").html(data);}); 
+    function(data){$("#maintext").html(data);}); 
     
 }
-/*
-function change_pairs(add_or_edit, custom, runner_name, more_or_less, current_count){
+
+function change_custom_type (add_or_edit, runner_name, custom_type, current_count){
    var form_input=$('#popup_form').serialize();
       
-	   $.get("ajax/ajax_edit.php", {
-	       action: "change_pairs",
-	       action_value: more_or_less,
-	       runner_type: runner_name,
-	       
-	       count: current_count,
-	       current_data : 'form&' + form_input
-	   }, 
-	    function(data){$("#runner_popup").html(data);}); 
-    
-}*/
+   $.get("ajax/ajax_edit.php", {
+       action: "change_custom_type",
+       action_value: custom_type,
+       runner_type: runner_name,
+       count: current_count,
+       current_data : 'form&' + form_input
+   }, 
+    function(data){
+    	$("#maintext").html(data);
 
+    	}); 
+
+}
+
+function change_restriction_type (add_or_edit, runner_name, current_count, change_id){
+   var form_input=$('#popup_form').serialize();
+
+   
+   $.get("ajax/ajax_edit.php", {
+       action: "change_restriction_type",
+       action_value: "change_restriction_type",
+       runner_type: runner_name,
+       count: current_count,
+       current_data : 'form&' + form_input
+   }, 
+    function(data){
+    	$("#maintext").html(data);
+
+    	}); 
+
+}
 
 function modify_runner(modify_type){
    var form_input=$('#popup_form').serialize();

@@ -62,7 +62,7 @@ class edit_control {
     
     // Outcome list
     $this->outcome_list = array("CORRECT", "INCORRECT");
-       
+		
   }
   
   function interactive_table(){
@@ -74,6 +74,8 @@ class edit_control {
   // this is the function called by the extended classes to build the popup table
   function popup(){       
 
+	echo "<h1>Add/Edit ".$this->runner_type."</h1>";
+
 	echo "<form id='popup_form' name='popup_form'>";
     echo "<table id='table_popup' style='width:100%;'>";
         
@@ -84,7 +86,7 @@ class edit_control {
 	echo "</form>";
 
     echo "<input type='button' onclick='modify_runner(\"".$this->runner_type."\")' value='Submit'>";
-    echo "<input type='button' onclick='close_analysis_popup()' value='Close'>";
+    echo "<input type='button' onclick='close_analysis_popup(\"".$this->runner_type."\")' value='Return/Cancel'>";
     echo "<br><div id='popup_output'></div>";
     
     //echo "</form>";
@@ -146,7 +148,7 @@ class edit_control {
     return $participant;
  }
 
-  function restriction_builder($max_number_of_restrictions=3, $columns=array('','',''),$symbols=array('','',''),$texts=array('','','')){
+  function restriction_builder($max_number_of_restrictions=3, $columns=array('','',''),$symbols=array('','',''),$texts=array('','',''), $types=array('','',''), $manuals=array('','','')){
    
     $symbol_list = array("=", "LIKE", ">", "<", "<=", ">=", "<>");
    
@@ -155,13 +157,45 @@ class edit_control {
     echo "Restrictions:";
     echo "</td>";
     echo "<td>";
-   
+	
     for($restriction_number=1; $restriction_number<=$max_number_of_restrictions; $restriction_number++){
       echo "Restriction #".$restriction_number.":"; 
-      option_list_builder('restriction_'.$restriction_number.'_column', $this->column_list, '', $columns[$restriction_number-1]);
-      option_list_builder('restriction_'.$restriction_number.'_symbol', $symbol_list, '', $symbols[$restriction_number-1]);
-      echo "<input type='text' id='restriction_".$restriction_number."_text' name='restriction_".$restriction_number."_text' value='".$texts[$restriction_number-1]."'>";
-      echo "<br>";
+	  
+	  echo "<input type='radio' name='restriction_".$restriction_number."_type' value='standard' 
+	  onclick='change_restriction_type(\"edit\", \"".$this->runner_type."\", 
+	  \"".$max_number_of_restrictions."\", \"".$restriction_number."\")' "; 
+	  //if ($types[$restriction_number-1] == "standard"){echo " checked ";} 
+	  //if ($types[$restriction_number-1] == ""){echo " checked ";}
+	  if ($types['restriction_'.$restriction_number.'_type'] == "standard"){echo " checked ";} 
+	  if ($types['restriction_'.$restriction_number.'_type'] != "standard" 
+	  	&& $types['restriction_'.$restriction_number.'_type'] != "manual"){echo " checked ";}
+	  
+	  echo " /> Standard &nbsp;";
+	  
+      echo "<input type='radio' name='restriction_".$restriction_number."_type' value='manual' 
+	  onclick='change_restriction_type(\"edit\", \"".$this->runner_type."\", 
+	  \"".$max_number_of_restrictions."\", \"".$restriction_number."\")' "; 
+	  //if ($types[$restriction_number-1] == "manual"){echo " checked ";} echo " /> Manual &nbsp;";
+	  if ($types['restriction_'.$restriction_number.'_type'] == "manual"){echo " checked ";} echo " /> Manual &nbsp;";
+		
+	  //if ($types[$restriction_number-1] == "standard" || $types[$restriction_number-1] == ""){
+	  if ($types['restriction_'.$restriction_number.'_type'] == "standard" || 
+	  	$types['restriction_'.$restriction_number.'_type'] == "" ){	
+		  option_list_builder('restriction_'.$restriction_number.'_column', $this->column_list, '', $columns[$restriction_number-1]);
+	      option_list_builder('restriction_'.$restriction_number.'_symbol', $symbol_list, '', $symbols[$restriction_number-1]);
+	      echo "<input type='text' id='restriction_".$restriction_number."_text' name='restriction_".$restriction_number."_text' value='".$texts[$restriction_number-1]."'>";
+	      echo "<br>";
+	  }
+	  
+	  //if ($types[$restriction_number-1] == "manual"){
+	  	if ($types['restriction_'.$restriction_number.'_type'] == "manual"){
+	  	echo "<br>";	
+	  	echo "<input type='text' id='restriction_".$restriction_number."_manual' 
+	  		name='restriction_".$restriction_number."_manual' 
+	  		value='".$manuals['restriction_'.$restriction_number.'_manual']."'>";
+	  }
+	  
+	  echo "<br>";
     }
     
     echo "<input type='button' onclick='change_restrictions(\"edit\", \"false\", \"".$this->runner_type."\", \"more\", \"".$max_number_of_restrictions."\")' value='Add Restriction'>";
@@ -170,6 +204,56 @@ class edit_control {
     echo "</tr>";
   
  }
+  
+  function form_custom_output ($type, $input_column, $computation, $output_value, $output_text, $output_manual, $restriction_count){
+		
+		echo "<tr>";
+        echo "<td>";
+        echo "Output Type:";
+        echo "</td>";
+        echo "<td>";
+
+		// radio button 	
+		echo "<input type='radio' name='output_type' value='calculation' 
+		onclick='change_custom_type(\"edit\", \"".$this->runner_type."\", \"calc\", \"".$restriction_count."\")' "; 
+		if ($type == "calculation"){echo " checked ";} echo " /> Calculation &nbsp;";
+		
+		echo "<input type='radio' name='output_type' value='text'
+		onclick='change_custom_type(\"edit\", \"".$this->runner_type."\", \"text\", \"".$restriction_count."\")' "; 
+		if ($type == "text"){echo " checked ";} echo " /> Text &nbsp;";
+
+		echo "<input type='radio' name='output_type' value='manual'
+		onclick='change_custom_type(\"edit\", \"".$this->runner_type."\", \"manual\", \"".$restriction_count."\")' ";  
+		if ($type == "manual"){echo " checked ";} echo " /> Manual &nbsp;";
+		
+	
+		// draw cell for calculation option
+		if ($type=="calculation"){
+			echo "<br>";	
+			option_list_builder("input_column", $this->column_list, '', $input_column); 		
+			echo "<br>";
+			option_list_builder("computation", $this->calculation_list, '', $computation); 
+			echo "<br>";
+			echo "<input type='text' id='output_value' name='output_value' value='".$output_value."'>";
+		}
+		
+		// draw cell for text option
+		if ($type=="text"){
+			echo "<br>";	
+			echo "<input type='text' id='output_text' name='output_text' value='".$output_text."'>";
+		}
+		
+		if ($type=="manual"){
+			echo "<br>";
+			echo "Type in a formula for output below. Note that is for advanced users only.";
+			echo "<input type='text' size='70' id='output_manual' name='output_manual' value='".$output_manual."'>";
+		}
+		
+		
+        echo "</td>";
+   		echo "</tr>"; 
+	}
+	
   
   function get_runner_attribs($name){   
     // get specific details about this runner
@@ -232,19 +316,6 @@ class edit_control {
   
   }
   
-  
-  /*function delete_completed_runner($name){
-   // this function removes completed runners from the completed runner list
-
-    $runner_query= "DELETE FROM ".$this->current_project.".completed_runner_list
-      WHERE runner = '".$name."'";
-    
-    $result = mysql_query($runner_query);
-    
-    if(mysql_error){echo mysql_error();}  
-    
-  }*/
-  
   function delete_runner_output($name, $output_list){
    // this function removes completed runners from the completed runner list
     
@@ -271,7 +342,7 @@ class edit_control {
     }
 	
 	// delete aggregated tables 
-	 if ($this->runner_type=='responses' || $this->runner_type=='time_periods'){
+	 if ($this->runner_type!='analyses'){
   		$this->delete_aggregated_tables();		
   	}
   }
@@ -332,6 +403,7 @@ class edit_control {
 include("edit_analyses.php");
 include("edit_responses.php");
 include("edit_time_periods.php");
+include("edit_custom.php");
 
 ?>
 
