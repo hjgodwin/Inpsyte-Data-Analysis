@@ -61,6 +61,8 @@ function import_tabbed_file ($ppt_id, $dir){
 		foreach($headers as $header){
 			
 			$header = trim($header);
+			$header = str_replace('[', '', $header);
+			$header = str_replace(']', '', $header);
 			
 			//echo $header; 
 			//echo "<br>";
@@ -114,7 +116,7 @@ function import_tabbed_file ($ppt_id, $dir){
 	    };
 	
 
-		// echo $header_query;
+		 echo $header_query;
 	
 		$result = mysql_query($header_query); if(mysql_error()) { echo mysql_error(); exit();}
 	
