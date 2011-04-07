@@ -258,7 +258,6 @@ if (isset($_GET['action']) && $_GET['action']=='add_project'){
 	ROW_FORMAT=DYNAMIC");
       
  $result=mysql_query("CREATE TABLE ".$_GET['project'].".time_periods_output (
-	CREATE TABLE `time_periods_output` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`runner` VARCHAR(20) NOT NULL,
 	`ppt_id` VARCHAR(15) NOT NULL,
