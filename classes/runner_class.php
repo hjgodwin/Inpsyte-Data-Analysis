@@ -98,8 +98,8 @@ class runner_control {
 			group by r.name");	
 				
 		// sets to refuse running if necessary
-		while($runner_row = mysql_fetch_array($runner_select))
-      		{if($runner_row[0]<$runner_row[2]){$need_more_runners=true;}}	
+	//	while($runner_row = mysql_fetch_array($runner_select))
+   //   		{if($runner_row[0]<$runner_row[2]){$need_more_runners=true;}}	
 	
 	}
 		
